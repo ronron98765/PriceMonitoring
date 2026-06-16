@@ -597,6 +597,11 @@ function loadDB(){
   return Array.isArray(DB_CACHE) ? DB_CACHE : [];
 }
 
+function saveDB(records){
+  DB_CACHE = Array.isArray(records) ? records : [];
+  return DB_CACHE;
+}
+
 async function refreshFromSheet(){
   if(!WEB_APP_URL || WEB_APP_URL.includes("PASTE_YOUR")){
     showToast("Please paste your Apps Script Web App URL in WEB_APP_URL.", 4000);
@@ -612,7 +617,7 @@ async function refreshFromSheet(){
       throw new Error(json.message || "Unable to load records.");
     }
 
-    DB_CACHE = (json.records || []).sort((a,b)=>a.date.localeCompare(b.date));
+    DB_CACHE = (json.records || []).sort((a,b)=>a.date.localeCompare(b.date)||String(a.market||'').localeCompare(String(b.market||'')));
     return DB_CACHE;
   }catch(err){
     console.error(err);
@@ -1137,10 +1142,10 @@ function renderRecordsList(){
   }
   el.innerHTML=db.slice().reverse().slice(0,40).map(r=>{
     const count=Object.values(r.data).filter(v=>v.pr>0).length;
-    return`<div class="record-item" onclick="openRecordModal('${r.date}')">
+    return`<div class="record-item" onclick="openRecordModal('${r.date}','${r.market||'cogon'}')">
       <div style="flex:1">
         <div class="record-date">${fmtDate(r.date)}</div>
-        <div class="record-sub">${count} prices recorded</div>
+        <div class="record-sub">${MARKET_NAMES[r.market]||r.market||'Cogon Market'} • ${count} prices recorded</div>
       </div>
       <span class="badge ${count>40?'green':count>20?'blue':'gray'}">${count} items</span>
       <span style="color:var(--gray-400);font-size:18px;font-weight:300">›</span>
@@ -1151,15 +1156,15 @@ function renderRecordsList(){
 // ═══════════════════════════════════
 // MODAL
 // ═══════════════════════════════════
-function openRecordModal(date){
+function openRecordModal(date,market){
   const db=loadDB();
-  const rec=db.find(r=>r.date===date);if(!rec)return;
+  const rec=db.find(r=>r.date===date&&String(r.market||'cogon')===String(market||'cogon'));if(!rec)return;
   const marketName=MARKET_NAMES[rec.market]||rec.market||'Cogon Market';
   document.getElementById('modalTitle').textContent=fmtDate(date)+' — '+marketName;
   const count=Object.values(rec.data).filter(v=>v.pr>0).length;
   let html=`<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-    <button class="btn sm primary" onclick="editRecord('${date}')">✏ Edit Entry</button>
-    <button class="btn sm danger" onclick="deleteRecord('${date}')">🗑 Delete</button>
+    <button class="btn sm primary" onclick="editRecord('${date}','${rec.market||'cogon'}')">✏ Edit Entry</button>
+    <button class="btn sm danger" onclick="deleteRecord('${date}','${rec.market||'cogon'}')">🗑 Delete</button>
     <span class="badge blue" style="margin-left:auto;align-self:center">${count} prices</span>
   </div>
   <div class="table-scroll"><table class="price-table">
@@ -1187,16 +1192,26 @@ function openRecordModal(date){
 
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 
-function deleteRecord(date){
-  if(!confirm('Delete entry for '+fmtDate(date)+'?'))return;
-  saveDB(loadDB().filter(r=>r.date!==date));
-  closeModal();showToast('Entry deleted.');
-  renderHistory();renderDashboard();
+async function deleteRecord(date,market){
+  if(!confirm('Delete entry for '+fmtDate(date)+' in '+(MARKET_NAMES[market]||market||'Cogon Market')+'?'))return;
+
+  try{
+    const json = await postToSheet({action:'deleteEntry', date, market});
+    if(json.status !== 'success'){
+      throw new Error(json.message || 'Delete failed.');
+    }
+    await refreshFromSheet();
+    closeModal();showToast('Entry deleted.');
+    populateHistoryFilters();renderHistory();renderDashboard();
+  }catch(err){
+    console.error(err);
+    showToast('Delete failed: '+err.message, 5000);
+  }
 }
 
-function editRecord(date){
+function editRecord(date,market){
   closeModal();
-  const rec=loadDB().find(r=>r.date===date);if(!rec)return;
+  const rec=loadDB().find(r=>r.date===date&&String(r.market||'cogon')===String(market||'cogon'));if(!rec)return;
   document.getElementById('entryDate').value=date;
   if(rec.market)document.getElementById('entryMarketSelect').value=rec.market;
   getAllItems().forEach(item=>{
