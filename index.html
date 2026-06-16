@@ -2,28 +2,234 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#0B2545">
-<title>Market Entry Offline</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Cogon Market — Price Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-<header class="top"><h1>Market Price Entry</h1><p>Standalone offline app with scrollable table, frozen title row, and frozen commodity column</p><div class="bar"><span class="chip">Offline Ready</span><span class="chip" id="recordCount">0 saved forms</span></div></header>
+
 <div class="toast" id="toast"></div>
-<main>
-<section id="entryView" class="wrap">
-<form id="entryForm">
-<div class="card"><div class="card-h"><div class="card-title">Monitoring Information</div><button type="button" class="btn danger" onclick="clearTable()">Clear Table</button></div><div class="card-b">
-<div class="grid"><div class="field"><label>Date</label><input type="date" id="entryDate" required></div><div class="field"><label>Market</label><select id="market"><option>Cogon Market</option><option>Divisoria Market</option><option>Langihan Market</option><option>Libertad Market</option><option>Patingi Market</option><option>Bancasi Market</option><option>Other Market</option></select></div></div>
-<div class="grid" style="margin-top:10px"><div class="field"><label>Enumerator</label><input id="enumerator" placeholder="Name of staff"></div><div class="field"><label>Upload File / Photo</label><input type="file" id="attachment" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"></div></div>
-</div><div class="table-wrap"><table class="price-table" id="entryTable"><thead><tr><th class="sticky-col">Commodity</th><th>Unit</th><th>Store 1</th><th>Store 2</th><th>Store 3</th><th>Store 4</th><th>Store 5</th><th>Low</th><th>High</th><th>Prevailing</th></tr></thead><tbody id="entryBody"></tbody></table></div></div>
-<div class="btnbar"><button type="button" class="btn amber" onclick="saveDraft()">Save Draft</button><button type="button" class="btn green" onclick="saveForm()">Save Offline</button><button type="button" class="btn primary" onclick="exportCSV()">Export CSV</button></div>
-</form>
-</section>
-<section id="recordsView" class="wrap hidden"><div class="card"><div class="card-h"><div class="card-title">Saved Monitoring Forms</div><button class="btn danger" onclick="deleteAll()">Delete All</button></div><div id="recordsList"></div></div></section>
-<section id="toolsView" class="wrap hidden"><div class="card"><div class="card-h"><div class="card-title">Backup / Transfer</div></div><div class="card-b"><div class="btnbar"><button class="btn primary" onclick="exportJSON()">Export JSON Backup</button><label class="btn green" style="text-align:center">Import JSON<input type="file" accept=".json,application/json" style="display:none" onchange="importJSON(event)"></label></div><p style="font-size:12px;color:#6b7280;line-height:1.45;margin-top:12px">Data is saved only on this device/browser. Use JSON backup to transfer records to another device. File attachments are included, but large files may exceed storage limits.</p></div></div></section>
-</main>
-<nav class="tabs"><button class="tab active" onclick="showTab('entry',this)"><span>📝</span>Entry</button><button class="tab" onclick="showTab('records',this)"><span>📋</span>Records</button><button class="tab" onclick="showTab('tools',this)"><span>💾</span>Backup</button></nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Entry Details</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody" style="padding:16px 16px 24px"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="app-nav">
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+    <div class="nav-title" style="line-height:1.2">
+      <div style="font-size:9px;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:0.06em;text-transform:uppercase">Market Monitoring</div>
+      <div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:-0.01em">Cagayan de Oro</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('dashboard',this)">Dashboard</button>
+    <button class="nav-tab" onclick="showView('history',this)">History</button>
+    <button class="nav-tab" onclick="showView('entry',this)">+ Entry</button>
+  </div>
+</nav>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="view-dashboard" class="view active">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted)">Viewing Market</div>
+      <select id="dashMarketFilter" onchange="renderDashboard()" style="font-family:inherit;font-size:14px;font-weight:800;color:var(--navy);background:transparent;border:none;outline:none;cursor:pointer;padding:0;letter-spacing:-0.01em;-webkit-appearance:none;margin-top:2px">
+        <option value="">All Markets</option>
+        <option value="cogon">Cogon Market</option>
+        <option value="divisoria">Divisoria Market</option>
+        <option value="langihan">Langihan Market</option>
+        <option value="libertad">Libertad Market</option>
+        <option value="patingi">Patingi Market</option>
+        <option value="bancasi">Bancasi Market</option>
+        <option value="other">Other Market</option>
+      </select>
+    </div>
+    <span class="badge blue" id="dashMarketBadge">All Markets</span>
+  </div>
+  <div class="stats-grid" id="dashStats"></div>
+  <div class="section-label">Top Price Movers — vs. 7 days ago</div>
+  <div class="movers-row" id="topMovers"></div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Price Trend</div>
+      <div class="chart-tabs">
+        <button class="chart-tab active" onclick="setDashRange('week',this)">7D</button>
+        <button class="chart-tab" onclick="setDashRange('month',this)">30D</button>
+        <button class="chart-tab" onclick="setDashRange('year',this)">1Y</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="cat-chips" id="dashCatChips"></div>
+      <div class="chart-wrap"><canvas id="dashChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Latest Prevailing Prices</div>
+      <span class="badge blue" id="dashLatestDate">—</span>
+    </div>
+    <div class="card-body no-pad">
+      <div class="table-scroll">
+        <table class="price-table">
+          <thead><tr>
+            <th>Commodity</th><th>Unit</th>
+            <th>Low</th><th>High</th><th>Prevailing</th><th>vs Prev.</th>
+          </tr></thead>
+          <tbody id="dashLatestTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HISTORY ═══ -->
+<div id="view-history" class="view">
+
+  <!-- FILTER CARD -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Filter & Date Selection</div></div>
+    <div class="card-body" style="padding:12px 14px;display:flex;flex-direction:column;gap:12px">
+
+      <!-- Period pills -->
+      <div class="filter-row">
+        <span class="filter-label">Period:</span>
+        <div class="pill-group">
+          <button class="pill active" onclick="setHistRange('week',this)">Week</button>
+          <button class="pill" onclick="setHistRange('month',this)">Month</button>
+          <button class="pill" onclick="setHistRange('year',this)">Year</button>
+        </div>
+      </div>
+
+      <!-- Group by -->
+      <div class="filter-row">
+        <span class="filter-label">Group by:</span>
+        <div class="pill-group">
+          <button class="pill active" id="grpDay"   onclick="setGroupBy('day',this)">Day</button>
+          <button class="pill"        id="grpWeek"  onclick="setGroupBy('week',this)">Week</button>
+          <button class="pill"        id="grpMonth" onclick="setGroupBy('month',this)">Month</button>
+        </div>
+      </div>
+
+      <!-- Month + Category selects -->
+      <div class="filter-row">
+        <span class="filter-label">Month:</span>
+        <select id="hFilterMonth" onchange="onMonthFilterChange()"></select>
+        <span class="filter-label">Category:</span>
+        <select id="hFilterCat" onchange="renderHistory()"></select>
+      </div>
+
+      <!-- Day-of-month calendar picker (shown when a month is selected) -->
+      <div id="dayPickerWrap" style="display:none">
+        <div class="filter-label" style="margin-bottom:6px">Day of month:</div>
+        <div class="day-grid-header">
+          <div class="day-header-cell">SUN</div><div class="day-header-cell">MON</div>
+          <div class="day-header-cell">TUE</div><div class="day-header-cell">WED</div>
+          <div class="day-header-cell">THU</div><div class="day-header-cell">FRI</div>
+          <div class="day-header-cell">SAT</div>
+        </div>
+        <div class="day-grid" id="dayGrid"></div>
+        <div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <button class="btn sm" onclick="clearDayFilter()">Show all days</button>
+          <span id="selectedDayLabel" style="font-size:11px;color:var(--text-muted)"></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PERIOD SUMMARY -->
+  <div class="section-label">Summary for selected period</div>
+  <div class="period-summary" id="periodSummary"></div>
+
+  <!-- HISTORY CHART -->
+  <div class="card">
+    <div class="card-header" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div class="hist-chart-row">
+        <div class="card-title">Commodity Trend</div>
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="setHistChartType('line',this)">Line</button>
+          <button class="chart-tab" onclick="setHistChartType('bar',this)">Bar</button>
+        </div>
+      </div>
+      <select id="histCommoditySelect" onchange="renderHistChart()" style="width:100%;font-size:12px;padding:7px 10px"></select>
+    </div>
+    <div class="card-body">
+      <div class="chart-wrap"><canvas id="histChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TABLE -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Prevailing Price Table</div>
+      <button class="btn sm" onclick="exportCSV()">⬇ CSV</button>
+    </div>
+    <div class="card-body no-pad">
+      <div class="table-scroll">
+        <table class="price-table">
+          <thead><tr id="histThead"></tr></thead>
+          <tbody id="histTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS LIST -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">All Monitoring Records</div>
+      <span class="badge gray" id="recordCount">0</span>
+    </div>
+    <div class="card-body no-pad" id="recordsList"></div>
+  </div>
+</div>
+
+<!-- ═══ ENTRY ═══ -->
+<div id="view-entry" class="view" style="padding:16px 16px 0">
+  <div class="entry-hero">
+    <h2>New Monitoring Entry</h2>
+    <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px">Agricultural Productivity Office — Cagayan de Oro</p>
+    <div class="entry-date-row" style="margin-top:12px">
+      <label>Market</label>
+      <select id="entryMarketSelect" onchange="onMarketChange()" style="font-family:inherit;font-size:13px;font-weight:700;color:var(--navy);background:rgba(255,255,255,0.95);border:1px solid rgba(255,255,255,0.3);border-radius:var(--radius-sm);padding:7px 12px;cursor:pointer;outline:none">
+        <option value="cogon">Cogon Market</option>
+        <option value="divisoria">Divisoria Market</option>
+        <option value="langihan">Langihan Market</option>
+        <option value="libertad">Libertad Market</option>
+        <option value="patingi">Patingi Market</option>
+        <option value="bancasi">Bancasi Market</option>
+        <option value="other">Other Market</option>
+      </select>
+    </div>
+    <div class="entry-date-row">
+      <label>Monitoring Date</label>
+      <input type="date" id="entryDate">
+    </div>
+  </div>
+  <div class="form-col-header" id="formColHeader">
+    <span>Commodity</span><span>Unit</span>
+    <span>Store 1</span><span>Store 2</span><span>Store 3</span><span>Store 4</span><span>Store 5</span>
+    <span>Low</span><span>High</span><span style="color:rgba(255,255,255,0.9)">Prevailing</span>
+  </div>
+  <div id="entryForm"></div>
+  <div class="form-actions">
+    <div class="save-status" id="saveStatus">✓ Saved successfully!</div>
+    <button class="btn" onclick="clearEntryForm()">Clear</button>
+    <button class="btn primary" onclick="saveEntry()">💾 Save Entry</button>
+  </div>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>
