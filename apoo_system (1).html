@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APOO Cagayan de Oro — Public Information System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1a6b2f;--green-mid:#2e8b4a;--green-light:#e8f5ec;--green-pale:#f4faf6;
+  --green-dark:#0f4520;--gold:#c8900a;--gold-light:#fef8ec;
+  --text:#1a1a18;--muted:#5a6357;--border:#d4e5d8;--white:#fff;
+  --red:#a32d2d;--red-light:#fcebeb;
+}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);font-size:15px;line-height:1.6}
+a{text-decoration:none;color:inherit}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,textarea,select{font-family:'DM Sans',sans-serif}
+
+/* VIEWS */
+.view{display:none}
+.view.active{display:block}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--green-dark);color:#fff;padding:12px 20px;border-radius:8px;font-size:13.5px;font-weight:500;z-index:9999;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;display:flex;align-items:center;gap:8px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.error{background:var(--red)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;padding:2rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
+.modal h3{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--green-dark);margin-bottom:1.2rem}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;line-height:1}
+.modal-close:hover{color:var(--text)}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px}
+.form-group input,.form-group textarea,.form-group select{width:100%;border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:14px;color:var(--text);background:var(--white);transition:border-color 0.2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--green-mid)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-submit{background:var(--green);color:#fff;border:none;padding:10px 24px;border-radius:7px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px}
+.btn-submit:hover{background:var(--green-dark)}
+.btn-cancel{background:none;border:1px solid var(--border);color:var(--muted);padding:10px 20px;border-radius:7px;font-size:14px;margin-right:8px}
+.btn-cancel:hover{background:var(--green-pale)}
+
+/* LOGIN */
+#view-login{min-height:100vh;background:var(--green-dark);display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;border-radius:16px;padding:2.5rem;width:100%;max-width:380px;text-align:center}
+.login-logo{width:80px;margin:0 auto 1rem}
+.login-logo img{width:80px}
+.login-box h2{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--green-dark);margin-bottom:4px}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.login-box .form-group{text-align:left}
+.login-btn{width:100%;background:var(--green);color:#fff;border:none;padding:11px;border-radius:8px;font-size:15px;font-weight:500;margin-top:0.5rem}
+.login-btn:hover{background:var(--green-dark)}
+.login-err{font-size:12.5px;color:var(--red);margin-top:8px;display:none}
+.back-public{margin-top:1rem;font-size:12.5px;color:var(--muted);cursor:pointer}
+.back-public:hover{color:var(--green)}
+
+/* PUBLIC NAV */
+#pub-nav{background:var(--white);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100}
+.nav-logos{display:flex;align-items:center;gap:12px}
+.nav-logos img{height:42px;width:auto;object-fit:contain}
+.nav-div{width:1px;height:28px;background:var(--border)}
+.nav-org strong{font-size:13px;font-weight:600;color:var(--green-dark);line-height:1.2;display:block}
+.nav-org span{font-size:11px;color:var(--muted);font-weight:300}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:var(--muted);font-size:12.5px;font-weight:400;padding:6px 10px;border-radius:5px;transition:all 0.2s}
+.nav-links a:hover{color:var(--green);background:var(--green-light)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-admin-btn{background:var(--green-pale);color:var(--green-dark);border:1px solid var(--border);padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px}
+.nav-admin-btn:hover{background:var(--green-light)}
+
+/* HERO */
+.hero{background:var(--green-dark);padding:3.5rem 2rem;display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;right:-60px;top:-60px;width:320px;height:320px;border-radius:50%;border:60px solid rgba(255,255,255,0.04)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:0.5px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 12px;margin-bottom:1rem}
+.hero-badge span{color:rgba(255,255,255,0.8);font-size:11px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase}
+.hero h1{font-family:'DM Serif Display',serif;color:#fff;font-size:34px;line-height:1.2;margin-bottom:0.8rem;font-weight:400;max-width:500px}
+.hero h1 em{color:#a8d5b5;font-style:italic}
+.hero p{color:rgba(255,255,255,0.65);font-size:14.5px;font-weight:300;line-height:1.75;max-width:460px;margin-bottom:1.5rem}
+.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn-white{background:#fff;color:var(--green-dark);border:none;padding:10px 22px;border-radius:6px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.btn-white:hover{background:#e8f5ec}
+.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:10px 22px;border-radius:6px;font-size:13.5px;font-weight:400;display:inline-flex;align-items:center;gap:7px}
+.btn-ghost:hover{background:rgba(255,255,255,0.08)}
+.hero-stats{display:flex;gap:1.5rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,0.12)}
+.hstat strong{display:block;color:#fff;font-family:'DM Serif Display',serif;font-size:22px;font-weight:400}
+.hstat span{color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase;letter-spacing:0.07em}
+.hero-logo-bg{opacity:0.12;flex-shrink:0;position:relative;z-index:1}
+.hero-logo-bg img{height:170px;width:auto;filter:brightness(10)}
+
+/* TICKER */
+.ticker{background:var(--gold-light);border-bottom:1px solid #e8d49a;padding:9px 0;display:flex;align-items:center;overflow:hidden}
+.ticker-label{background:var(--gold);color:#fff;font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:4px 14px;white-space:nowrap;flex-shrink:0;margin-right:16px;display:flex;align-items:center;gap:5px}
+.ticker-wrap{overflow:hidden;flex:1}
+.ticker-track{display:flex;gap:3rem;animation:tick 35s linear infinite;white-space:nowrap}
+.ticker-track:hover{animation-play-state:paused}
+.titem{font-size:13px;color:#3d2a00;display:inline-flex;align-items:center;gap:5px}
+.price-up{color:#1a6b2f;font-weight:600}
+.price-down{color:var(--red);font-weight:600}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:2.5rem 2rem}
+.section-eyebrow{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--green-mid);margin-bottom:4px}
+.section-title{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;color:var(--green-dark);margin-bottom:4px}
+.section-desc{color:var(--muted);font-size:13.5px;margin-bottom:1.2rem}
+.divider{height:1px;background:var(--border);margin:0 2rem}
+
+/* QUICK ACCESS */
+.qa-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.qa-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.1rem 0.8rem;text-align:center;cursor:pointer;transition:all 0.2s}
+.qa-card:hover{border-color:var(--green-mid);background:var(--green-light);transform:translateY(-2px)}
+.qa-card i{font-size:24px;color:var(--green-mid);display:block;margin-bottom:7px}
+.qa-card span{font-size:12.5px;font-weight:500;color:var(--green-dark);line-height:1.3;display:block}
+
+/* NEWS */
+.news-grid{display:grid;grid-template-columns:1.8fr 1fr;gap:14px}
+.news-feat{background:var(--green-pale);border:1px solid var(--border);border-radius:12px;padding:1.4rem 1.5rem}
+.news-feat-tag{font-size:10.5px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--green-mid);margin-bottom:8px}
+.news-feat h3{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--green-dark);line-height:1.35;margin-bottom:8px}
+.news-feat p{font-size:13px;color:var(--muted);line-height:1.65}
+.news-meta{font-size:11px;color:#9aab97;margin-top:10px;display:flex;align-items:center;gap:5px}
+.news-list{display:flex;flex-direction:column;gap:10px}
+.news-item{border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;cursor:pointer;transition:background 0.2s;background:var(--white)}
+.news-item:hover{background:var(--green-pale)}
+.news-item-tag{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--green-mid);margin-bottom:5px}
+.news-item h4{font-size:13px;font-weight:500;color:var(--green-dark);line-height:1.4;margin-bottom:4px}
+.news-item .meta{font-size:11px;color:#9aab97}
+.empty-state{text-align:center;padding:2rem;color:var(--muted);font-size:13.5px;border:1px dashed var(--border);border-radius:10px}
+.empty-state i{font-size:28px;display:block;margin-bottom:8px;color:var(--border)}
+
+/* PRICES TABLE */
+.prices-table-wrap{overflow-x:auto}
+.prices-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.prices-table thead th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);border-bottom:2px solid var(--border);white-space:nowrap}
+.prices-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s}
+.prices-table tbody tr:hover{background:var(--green-pale)}
+.prices-table td{padding:10px 14px;color:var(--text)}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-light);color:var(--green)}
+.badge-gold{background:var(--gold-light);color:var(--gold)}
+.badge-red{background:var(--red-light);color:var(--red)}
+.price-up-cell{color:var(--green);font-weight:600}
+.price-down-cell{color:var(--red);font-weight:600}
+.price-same{color:var(--muted)}
+
+/* DASHBOARD */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.m-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.m-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px}
+.m-val{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--green-dark)}
+.m-trend{font-size:11px;margin-top:3px;display:flex;align-items:center;gap:3px}
+.m-trend.up{color:var(--green-mid)}.m-trend.down{color:var(--red)}
+.chart-row{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.chart-box{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.1rem;height:160px;display:flex;flex-direction:column}
+.chart-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.bars{display:flex;align-items:flex-end;gap:5px;flex:1}
+.bp{display:flex;gap:2px;align-items:flex-end;flex:1}
+.b{border-radius:3px 3px 0 0}
+.b.s{background:var(--green-mid)}.b.d{background:var(--gold)}
+.leg{display:flex;gap:14px;margin-top:8px}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.ld{width:9px;height:9px;border-radius:2px}
+
+/* MAPS */
+.map-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.mt{border:1px solid var(--border);background:var(--white);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--muted);cursor:pointer}
+.mt.active{background:var(--green);color:#fff;border-color:var(--green)}
+.map-ph{background:var(--green-pale);border:1px solid var(--border);border-radius:12px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.map-ph i{font-size:40px;color:var(--green-mid)}
+.map-ph strong{font-size:14px;color:var(--green-dark);font-weight:500}
+.map-ph span{font-size:12.5px;color:var(--muted)}
+.map-ph a{font-size:13px;color:var(--green);font-weight:500;margin-top:4px}
+.map-ph a:hover{text-decoration:underline}
+.map-iframe-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);height:380px}
+.map-iframe-wrap iframe{width:100%;height:100%;border:none;display:block}
+
+/* RISE */
+.rise-section{background:var(--green-dark)}
+.rise-section .section-eyebrow{color:#a8d5b5}
+.rise-section .section-title{color:#fff}
+.rise-section .section-desc{color:rgba(255,255,255,0.55)}
+.rise-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.rise-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.3rem 1.1rem;border-top:3px solid}
+.rise-card.r{border-top-color:#4fc87a}.rise-card.i{border-top-color:#5ab4f0}
+.rise-card.s{border-top-color:#f0c040}.rise-card.e{border-top-color:#f07855}
+.rise-letter{font-family:'DM Serif Display',serif;font-size:36px;margin-bottom:4px;line-height:1}
+.rise-card.r .rise-letter{color:#4fc87a}.rise-card.i .rise-letter{color:#5ab4f0}
+.rise-card.s .rise-letter{color:#f0c040}.rise-card.e .rise-letter{color:#f07855}
+.rise-card h4{font-size:13.5px;font-weight:600;color:#fff;margin-bottom:5px}
+.rise-card p{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+.about-text p{font-size:14px;color:var(--muted);line-height:1.75;margin-bottom:1rem}
+.mv-stack{display:flex;flex-direction:column;gap:10px}
+.mv-block{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--green-mid);border-radius:0 8px 8px 0;padding:1rem 1.2rem}
+.mv-block h4{font-size:13px;font-weight:600;color:var(--green-dark);margin-bottom:5px;display:flex;align-items:center;gap:7px}
+.mv-block p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ci{background:var(--green-pale);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;display:flex;flex-direction:column;gap:8px}
+.ci-icon{width:36px;height:36px;background:var(--green-light);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.ci-icon i{font-size:17px;color:var(--green-mid)}
+.ci h5{font-size:13px;font-weight:600;color:var(--green-dark)}
+.ci p{font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* FOOTER */
+footer{background:var(--green-dark);padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.footer-left{display:flex;align-items:center;gap:12px}
+.footer-left img{height:30px;width:auto}
+.footer-left p{color:rgba(255,255,255,0.4);font-size:12px}
+.footer-links{display:flex;gap:16px}
+.footer-links a{color:rgba(255,255,255,0.4);font-size:12px}
+.footer-links a:hover{color:#fff}
+
+/* ADMIN */
+#view-admin{display:none;min-height:100vh;background:#f0f4f1}
+#view-admin.active{display:flex}
+.admin-sidebar{width:240px;background:var(--green-dark);flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.admin-brand{padding:1.2rem 1.4rem;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px}
+.admin-brand img{height:36px}
+.admin-brand div strong{display:block;color:#fff;font-size:13px;font-weight:600;line-height:1.2}
+.admin-brand div span{color:rgba(255,255,255,0.5);font-size:11px}
+.admin-nav{padding:1rem 0;flex:1}
+.admin-nav-label{padding:6px 1.4rem;font-size:10.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3)}
+.admin-nav-item{display:flex;align-items:center;gap:10px;padding:9px 1.4rem;color:rgba(255,255,255,0.65);font-size:13.5px;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
+.admin-nav-item i{font-size:18px;flex-shrink:0}
+.admin-nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.admin-nav-item.active{background:rgba(255,255,255,0.1);color:#fff;border-left-color:#4fc87a}
+.admin-logout{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,0.1)}
+.admin-logout button{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);font-size:13px;background:none;border:none;cursor:pointer;padding:0}
+.admin-logout button:hover{color:#fff}
+.admin-main{flex:1;overflow-y:auto;padding:2rem}
+.admin-panel{display:none}
+.admin-panel.active{display:block}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+.admin-topbar h2{font-family:'DM Serif Display',serif;font-size:24px;font-weight:400;color:var(--green-dark)}
+.admin-topbar p{font-size:13px;color:var(--muted);margin-top:2px}
+.btn-add{background:var(--green);color:#fff;border:none;padding:9px 18px;border-radius:7px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:7px}
+.btn-add:hover{background:var(--green-dark)}
+.admin-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.admin-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.admin-table thead th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.admin-table tbody tr{border-bottom:1px solid var(--border)}
+.admin-table tbody tr:hover{background:var(--green-pale)}
+.admin-table td{padding:10px 12px;vertical-align:middle}
+.tbl-actions{display:flex;gap:6px}
+.btn-edit{background:var(--green-light);color:var(--green-dark);border:none;padding:5px 12px;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.btn-edit:hover{background:#c5e8cc}
+.btn-del{background:var(--red-light);color:var(--red);border:none;padding:5px 12px;border-radius:5px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:4px}
+.btn-del:hover{background:#f7c1c1}
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.astat{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;border-top:3px solid var(--green-mid)}
+.astat-val{font-family:'DM Serif Display',serif;font-size:24px;color:var(--green-dark)}
+.astat-label{font-size:12px;color:var(--muted);margin-top:2px}
+.sync-box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--green-pale);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:1rem;flex-wrap:wrap}
+.sync-status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--green-dark)}
+.sync-status::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--gold);display:inline-block}
+.sync-status.online::before{background:var(--green-mid)}
+.sync-status.error::before{background:var(--red)}
+.sync-actions{display:flex;gap:8px;flex-wrap:wrap}
+.market-live{background:var(--green-pale);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin-bottom:12px}
+.market-live-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.market-live-head h3{font-size:14px;font-weight:600;color:var(--green-dark)}
+.market-live-head a{font-size:12.5px;color:var(--green);font-weight:600}
+.market-live-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.market-live-stat{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px}
+.market-live-stat span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:2px}
+.market-live-stat strong{font-family:'DM Serif Display',serif;font-size:19px;font-weight:400;color:var(--green-dark)}
+.market-mini-table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;font-size:12.5px}
+.market-mini-table th,.market-mini-table td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+.market-mini-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:#fff}
+.market-mini-table td:last-child,.market-mini-table th:last-child{text-align:right;font-weight:600;color:var(--green-dark)}
+
+@media(max-width:900px){
+  .nav-links{display:none}
+  .metrics{grid-template-columns:1fr 1fr}
+  .contact-grid{grid-template-columns:1fr 1fr}
+  .rise-grid{grid-template-columns:1fr 1fr}
+  .about-grid{grid-template-columns:1fr}
+  .news-grid{grid-template-columns:1fr}
+  .admin-sidebar{width:200px}
+  .admin-stats{grid-template-columns:1fr 1fr}
+  .chart-row{grid-template-columns:1fr}
+  .market-live-grid{grid-template-columns:1fr 1fr}
+  .hero{grid-template-columns:1fr}
+  .hero-logo-bg{display:none}
+}
+@media(max-width:600px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .rise-grid{grid-template-columns:1fr 1fr}
+  .contact-grid{grid-template-columns:1fr 1fr}
+  .admin-stats{grid-template-columns:1fr 1fr}
+  section{padding:2rem 1rem}
+  #pub-nav{padding:0 1rem}
+  .hero{padding:2.5rem 1rem}
+  footer{padding:1.2rem 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast"><i class="ti ti-check"></i><span id="toast-msg">Saved</span></div>
+
+<!-- ===== LOGIN VIEW ===== -->
+<div id="view-login" class="view active">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="APOO_Office_Logo-removebg-preview.png" style="width:90px;height:90px;object-fit:contain">
+    </div>
+    <h2>APOO Admin Panel</h2>
+    <p>Agricultural Productivity Operations Office<br>Cagayan de Oro City</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="Enter username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Enter password" autocomplete="current-password">
+    </div>
+    <p class="login-err" id="login-err"><i class="ti ti-alert-circle"></i> Invalid username or password.</p>
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <p class="back-public" onclick="showPublic()"><i class="ti ti-arrow-left"></i> Back to Public Site</p>
+    <p style="font-size:11px;color:#aaa;margin-top:1rem">Default: admin / apoo2026</p>
+  </div>
+</div>
+
+<!-- ===== PUBLIC VIEW ===== -->
+<div id="view-public" class="view">
+
+  <!-- NAV -->
+  <nav id="pub-nav">
+    <div class="nav-logos">
+      <img src="APOO_Office_Logo-removebg-preview.png" alt="APOO Logo" style="height:48px;width:auto;object-fit:contain">
+      <div class="nav-div"></div>
+      <img src="CDO_FULL_LOGO.png" alt="CDO Logo" style="height:42px;width:auto;object-fit:contain">
+      <div class="nav-div"></div>
+      <div class="nav-org">
+        <strong id="pub-org-name">Agricultural Productivity Operations Office</strong>
+        <span id="pub-org-sub">Cagayan de Oro City &middot; Since 1961</span>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="#news">News</a>
+      <a href="#prices">Prices</a>
+      <a href="#maps">Maps</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#rise">RISE</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <button class="nav-admin-btn" onclick="showLogin()"><i class="ti ti-lock"></i> Admin</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="hero-badge"><i class="ti ti-leaf" style="color:#a8d5b5;font-size:12px"></i><span>Official Public Information Portal</span></div>
+      <h1>Agriculture &amp; Fisheries<br><em>Cagayan de Oro City</em></h1>
+      <p id="pub-hero-desc">Serving the farmers, fisherfolk, and consumers of the City of Golden Friendship. Access commodity prices, production data, maps, and agricultural programs — all in one place.</p>
+      <div class="hero-btns">
+        <button class="btn-white" onclick="scrollToSection('dashboard')"><i class="ti ti-chart-bar" style="font-size:14px"></i> View Dashboard</button>
+        <button class="btn-ghost" onclick="scrollToSection('maps')"><i class="ti ti-map-pin" style="font-size:14px"></i> Explore Maps</button>
+      </div>
+      <div class="hero-stats" id="pub-hero-stats">
+        <div class="hstat"><strong>48+</strong><span>Commodities</span></div>
+        <div class="hstat"><strong>12</strong><span>Markets</span></div>
+        <div class="hstat"><strong>Daily</strong><span>Price Updates</span></div>
+        <div class="hstat"><strong>Since 1961</strong><span>In Service</span></div>
+      </div>
+    </div>
+    <div class="hero-logo-bg">
+      <img src="APOO_Office_Logo-removebg-preview.png" alt="APOO" style="height:180px;width:auto;filter:brightness(10)">
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-label"><i class="ti ti-trending-up" style="font-size:11px"></i> Live Prices</div>
+    <div class="ticker-wrap">
+      <div class="ticker-track" id="ticker-track">
+        <span class="titem">Loading prices...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK ACCESS -->
+  <section style="background:var(--green-pale)">
+    <div class="section-eyebrow">Quick Access</div>
+    <div class="section-title">Public Services</div>
+    <div class="section-desc">Direct access to all public information and services offered by APOO.</div>
+    <div class="qa-grid">
+      <div class="qa-card" onclick="scrollToSection('news')"><i class="ti ti-news"></i><span>News &amp; Updates</span></div>
+      <div class="qa-card" onclick="scrollToSection('prices')"><i class="ti ti-currency-peso"></i><span>Prevailing Prices</span></div>
+      <div class="qa-card" onclick="scrollToSection('maps')"><i class="ti ti-map-2"></i><span>Agri Maps</span></div>
+      <div class="qa-card" onclick="scrollToSection('dashboard')"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></div>
+      <div class="qa-card" onclick="scrollToSection('dashboard')"><i class="ti ti-chart-dots"></i><span>Statistics</span></div>
+      <div class="qa-card" onclick="scrollToSection('dashboard')"><i class="ti ti-scale"></i><span>Supply &amp; Demand</span></div>
+      <div class="qa-card" onclick="scrollToSection('rise')"><i class="ti ti-target"></i><span>RISE Agenda</span></div>
+      <div class="qa-card" onclick="scrollToSection('contact')"><i class="ti ti-address-book"></i><span>Contact Us</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- NEWS -->
+  <section id="news">
+    <div class="section-eyebrow">Announcements</div>
+    <div class="section-title">News &amp; Updates</div>
+    <div class="section-desc">Latest advisories, reports, and programs from APOO Cagayan de Oro.</div>
+    <div id="pub-news-container"></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PRICES -->
+  <section id="prices" style="background:var(--green-pale)">
+    <div class="section-eyebrow">Market Information</div>
+    <div class="section-title">Prevailing Commodity Prices</div>
+    <div class="section-desc">Farm gate and retail prices updated regularly from market monitoring.</div>
+    <div class="prices-table-wrap">
+      <table class="prices-table">
+        <thead>
+          <tr>
+            <th>Commodity</th>
+            <th>Category</th>
+            <th>Unit</th>
+            <th>Farm Gate Price</th>
+            <th>Retail Price</th>
+            <th>Change</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="pub-prices-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard">
+    <div class="section-eyebrow">Analytics</div>
+    <div class="section-title">Summary Dashboard</div>
+    <div class="section-desc">At-a-glance overview of agricultural production and market performance.</div>
+    <div class="metrics" id="pub-metrics">
+      <div class="m-card"><div class="m-label">Total Production</div><div class="m-val" id="dash-production">—</div><div class="m-trend up" id="dash-prod-trend"></div></div>
+      <div class="m-card"><div class="m-label">Registered Farmers</div><div class="m-val" id="dash-farmers">—</div><div class="m-trend" id="dash-farm-trend"></div></div>
+      <div class="m-card"><div class="m-label">Avg. Farm Gate Price</div><div class="m-val" id="dash-price">—</div><div class="m-trend" id="dash-price-trend"></div></div>
+      <div class="m-card"><div class="m-label">Active Market Outlets</div><div class="m-val" id="dash-markets">—</div><div class="m-trend" id="dash-mkt-trend"></div></div>
+    </div>
+    <div class="market-live" id="market-live-card">
+      <div class="market-live-head">
+        <h3><i class="ti ti-building-store" style="font-size:15px;color:var(--green-mid)"></i> Market Monitoring Summary</h3>
+        <a href="https://ronron98765.github.io/PriceMonitoring/" target="_blank" rel="noopener">Open full price monitor</a>
+      </div>
+      <div class="market-live-grid">
+        <div class="market-live-stat"><span>Latest Date</span><strong id="market-live-date">—</strong></div>
+        <div class="market-live-stat"><span>Markets</span><strong id="market-live-markets">—</strong></div>
+        <div class="market-live-stat"><span>Commodities</span><strong id="market-live-commodities">—</strong></div>
+        <div class="market-live-stat"><span>Avg. Prevailing</span><strong id="market-live-avg">—</strong></div>
+      </div>
+      <div class="prices-table-wrap">
+        <table class="market-mini-table">
+          <thead><tr><th>Commodity</th><th>Unit</th><th>Low</th><th>High</th><th>Prevailing</th></tr></thead>
+          <tbody id="market-live-tbody"><tr><td colspan="5" style="text-align:center;color:var(--muted)">Loading market monitoring data...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-box">
+        <div class="chart-title">Supply vs. Demand — Weekly Overview</div>
+        <div class="bars" id="pub-chart-bars">
+          <div class="bp"><div class="b s" style="height:65px;flex:1"></div><div class="b d" style="height:80px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:75px;flex:1"></div><div class="b d" style="height:70px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:85px;flex:1"></div><div class="b d" style="height:60px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:60px;flex:1"></div><div class="b d" style="height:88px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:78px;flex:1"></div><div class="b d" style="height:72px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:90px;flex:1"></div><div class="b d" style="height:80px;flex:1"></div></div>
+          <div class="bp"><div class="b s" style="height:68px;flex:1"></div><div class="b d" style="height:85px;flex:1"></div></div>
+        </div>
+        <div class="leg"><div class="li"><div class="ld" style="background:var(--green-mid)"></div>Supply</div><div class="li"><div class="ld" style="background:var(--gold)"></div>Demand</div></div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.1rem">
+        <div class="chart-title">Supply &amp; Demand Summary</div>
+        <div id="pub-sd-summary" style="font-size:13px;color:var(--muted);line-height:1.8">Enter supply &amp; demand data in the admin panel to populate this section.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MAPS -->
+  <section id="maps" style="background:var(--green-pale)">
+    <div class="section-eyebrow">Geospatial</div>
+    <div class="section-title">Maps</div>
+    <div class="section-desc">Interactive maps for production areas, public markets, and development projects across Cagayan de Oro.</div>
+    <div class="map-tabs">
+      <div class="mt active" onclick="setMapTab(this,'agri')">Agri Production Sites</div>
+      <div class="mt" onclick="setMapTab(this,'market')">Market Locations</div>
+      <div class="mt" onclick="setMapTab(this,'project')">Project Areas</div>
+      <div class="mt" onclick="setMapTab(this,'fishery')">Fishery Zones</div>
+    </div>
+    <div id="map-display">
+      <div class="map-ph">
+        <i class="ti ti-map"></i>
+        <strong>Interactive Map Viewer</strong>
+        <span>Add a map link in the Admin Panel to display here</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- RISE -->
+  <section id="rise" class="rise-section">
+    <div class="section-eyebrow">Strategic Framework</div>
+    <div class="section-title">RISE Agenda</div>
+    <div class="section-desc" id="pub-rise-intro">Our four-pillar development framework guiding agri-fisheries programs in Cagayan de Oro City.</div>
+    <div class="rise-grid" id="pub-rise-grid">
+      <div class="rise-card r"><div class="rise-letter">R</div><h4>REGIONAL LEADERSHIP: METROPOLIZATION, ACCESSIBILITY, AND CONNECTIVITY</h4><p>Building climate-adaptive and disaster-resilient farming and fishing communities.</p></div>
+      <div class="rise-card i"><div class="rise-letter">I</div><h4>INSTITUTIONAL DEVELOPMENT AND PARTICIPATORY GOVERNANCE</h4><p>Ensuring equitable access to support services for smallholder farmers and fisherfolk.</p></div>
+      <div class="rise-card s"><div class="rise-letter">S</div><h4>SAFETY, SECURITY, AND HUMAN DEVELOPMENT</h4><p>Promoting responsible resource use and environmentally sound agricultural practices.</p></div>
+      <div class="rise-card e"><div class="rise-letter">E</div><h4>ECONOMIC RECOVERY</h4><p>Delivering high-quality public service through data-driven programs and innovation.</p></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about" style="background:var(--green-pale)">
+    <div class="section-eyebrow">Organization</div>
+    <div class="section-title">About APOO</div>
+    <div class="section-desc">Agricultural Productivity Operations Office &middot; Cagayan de Oro City</div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p id="pub-about-desc">The Agricultural Productivity Operations Office (APOO) of Cagayan de Oro City is the local government unit mandated to promote, develop, and regulate agriculture and fisheries since 1961 — ensuring food security and the welfare of farmers and fisherfolk in the City of Golden Friendship.</p>
+        <p id="pub-about-desc2">APOO provides extension services, technical assistance, market information, and direct support programs to more than 18,000 registered farmers and fisherfolk across all 80 barangays of the city.</p>
+      </div>
+      <div class="mv-stack">
+        <div class="mv-block"><h4><i class="ti ti-eye" style="font-size:15px;color:var(--green-mid)"></i>Vision</h4><p id="pub-vision">A food-secure and prosperous Cagayan de Oro with resilient and sustainable agriculture and fisheries sectors.</p></div>
+        <div class="mv-block"><h4><i class="ti ti-flag" style="font-size:15px;color:var(--green-mid)"></i>Mission</h4><p id="pub-mission">To provide effective support services enabling equitable and sustainable agri-fishery development for the city's farming and fishing communities.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="section-eyebrow">Get in Touch</div>
+    <div class="section-title">Contact Us</div>
+    <div class="section-desc">Reach the Agricultural Productivity Operations Office of Cagayan de Oro City.</div>
+    <div class="contact-grid" id="pub-contact-grid">
+      <div class="ci"><div class="ci-icon"><i class="ti ti-map-pin"></i></div><h5>Office Address</h5><p id="pub-address">APOO Building, City Hall Compound, Cagayan de Oro City, Misamis Oriental</p></div>
+      <div class="ci"><div class="ci-icon"><i class="ti ti-phone"></i></div><h5>Telephone</h5><p id="pub-phone">(088) 856-0000 local 1234</p></div>
+      <div class="ci"><div class="ci-icon"><i class="ti ti-mail"></i></div><h5>Email</h5><p id="pub-email">apoo@cdocity.gov.ph</p></div>
+      <div class="ci"><div class="ci-icon"><i class="ti ti-clock"></i></div><h5>Office Hours</h5><p id="pub-hours">Monday – Friday<br>8:00 AM – 5:00 PM</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <img src="APOO_Office_Logo-removebg-preview.png" alt="APOO" style="height:32px;width:auto;object-fit:contain">
+      <p>&copy; 2026 Agricultural Productivity Operations Office &middot; Cagayan de Oro City &middot; Republic of the Philippines</p>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Transparency Seal</a>
+      <a href="#">FOI</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </footer>
+</div><!-- end public view -->
+
+<!-- ===== ADMIN VIEW ===== -->
+<div id="view-admin" class="view">
+  <div class="admin-sidebar">
+    <div class="admin-brand">
+      <img src="APOO_Office_Logo-removebg-preview.png" alt="APOO" style="height:38px;width:auto;object-fit:contain">
+      <div><strong>APOO Admin</strong><span>CDO City</span></div>
+    </div>
+    <nav class="admin-nav">
+      <div class="admin-nav-label">Content</div>
+      <div class="admin-nav-item active" onclick="showAdminPanel('dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('news')"><i class="ti ti-news"></i>News &amp; Updates</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('prices')"><i class="ti ti-currency-peso"></i>Commodity Prices</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('supplydemand')"><i class="ti ti-scale"></i>Supply &amp; Demand</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('maps')"><i class="ti ti-map-2"></i>Maps</div>
+      <div class="admin-nav-label">Organization</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('rise')"><i class="ti ti-target"></i>RISE Agenda</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('about')"><i class="ti ti-building"></i>About / Profile</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('contact')"><i class="ti ti-address-book"></i>Contact Info</div>
+      <div class="admin-nav-label">System</div>
+      <div class="admin-nav-item" onclick="showAdminPanel('settings')"><i class="ti ti-settings"></i>Settings</div>
+    </nav>
+    <div class="admin-logout">
+      <button onclick="doLogout()"><i class="ti ti-logout" style="font-size:16px"></i> Log Out</button>
+    </div>
+  </div>
+
+  <div class="admin-main">
+    <!-- ADMIN DASHBOARD -->
+    <div id="ap-dashboard" class="admin-panel active">
+      <div class="admin-topbar">
+        <div><h2>Dashboard Overview</h2><p>Summary of all content in the system</p></div>
+        <button class="nav-admin-btn" onclick="showPublic()"><i class="ti ti-eye"></i> View Public Site</button>
+      </div>
+      <div class="admin-stats">
+        <div class="astat"><div class="astat-val" id="adash-news">0</div><div class="astat-label">News Articles</div></div>
+        <div class="astat"><div class="astat-val" id="adash-prices">0</div><div class="astat-label">Commodities Tracked</div></div>
+        <div class="astat"><div class="astat-val" id="adash-sd">0</div><div class="astat-label">Supply/Demand Entries</div></div>
+        <div class="astat"><div class="astat-val" id="adash-maps">0</div><div class="astat-label">Map Links</div></div>
+      </div>
+      <div class="admin-card">
+        <strong style="font-size:14px;color:var(--green-dark)">Quick Guide</strong>
+        <ul style="margin-top:10px;padding-left:1.2rem;font-size:13.5px;color:var(--muted);line-height:2">
+          <li>Use <b>News &amp; Updates</b> to post announcements, advisories, and events.</li>
+          <li>Use <b>Commodity Prices</b> to manage the price table shown on the public site.</li>
+          <li>Use <b>Supply &amp; Demand</b> to update the dashboard metrics and chart data.</li>
+          <li>Use <b>Maps</b> to add Google Maps or other embed links per category.</li>
+          <li>Use <b>RISE Agenda</b> to edit the four-pillar descriptions.</li>
+          <li>Use <b>About / Profile</b> to edit vision, mission, and organizational description.</li>
+          <li>Use <b>Contact Info</b> to update office address, phone, email, and hours.</li>
+          <li>Use <b>Settings</b> to change the admin password.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ADMIN NEWS -->
+    <div id="ap-news" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>News &amp; Updates</h2><p>Manage public announcements and news articles</p></div>
+        <button class="btn-add" onclick="openModal('news')"><i class="ti ti-plus"></i> Add Article</button>
+      </div>
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Featured</th><th>Actions</th></tr></thead>
+          <tbody id="admin-news-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN PRICES -->
+    <div id="ap-prices" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>Commodity Prices</h2><p>Manage prevailing farm gate and retail prices</p></div>
+        <button class="btn-add" onclick="openModal('price')"><i class="ti ti-plus"></i> Add Commodity</button>
+      </div>
+      <div class="admin-card">
+        <table class="admin-table">
+          <thead><tr><th>Commodity</th><th>Category</th><th>Unit</th><th>Farm Gate (&#8369;)</th><th>Retail (&#8369;)</th><th>Change</th><th>Updated</th><th>Actions</th></tr></thead>
+          <tbody id="admin-prices-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN SUPPLY & DEMAND -->
+    <div id="ap-supplydemand" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>Supply &amp; Demand</h2><p>Update dashboard metrics and key figures</p></div>
+        <button class="btn-add" onclick="saveSDData()"><i class="ti ti-device-floppy"></i> Save All</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:1.2rem">These values appear in the Summary Dashboard on the public site.</p>
+        <div class="form-row">
+          <div class="form-group"><label>Total Production</label><input type="text" id="sd-production" placeholder="e.g. 124,580 MT"></div>
+          <div class="form-group"><label>Production Trend</label><input type="text" id="sd-prod-trend" placeholder="e.g. +8.3% vs last quarter"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Registered Farmers</label><input type="text" id="sd-farmers" placeholder="e.g. 18,204"></div>
+          <div class="form-group"><label>Farmers Trend</label><input type="text" id="sd-farm-trend" placeholder="e.g. +1.2% registered"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Avg. Farm Gate Price</label><input type="text" id="sd-avgprice" placeholder="e.g. &#8369;24.80/kg"></div>
+          <div class="form-group"><label>Price Trend</label><input type="text" id="sd-price-trend" placeholder="e.g. -0.5% vs last week"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Active Market Outlets</label><input type="text" id="sd-markets" placeholder="e.g. 37"></div>
+          <div class="form-group"><label>Markets Trend</label><input type="text" id="sd-mkt-trend" placeholder="e.g. 3 new this quarter"></div>
+        </div>
+        <div class="form-group"><label>Supply &amp; Demand Summary (shown in chart panel)</label><textarea id="sd-summary" rows="4" placeholder="Enter a brief narrative about supply and demand conditions this period..."></textarea></div>
+        <button class="btn-submit" onclick="saveSDData()"><i class="ti ti-device-floppy"></i> Save Dashboard Data</button>
+      </div>
+    </div>
+
+    <!-- ADMIN MAPS -->
+    <div id="ap-maps" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>Maps</h2><p>Manage map links for each category</p></div>
+        <button class="btn-add" onclick="openModal('map')"><i class="ti ti-plus"></i> Add Map Link</button>
+      </div>
+      <div class="admin-card">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Paste a Google Maps embed URL or any iframe-compatible map link. The map will display on the public site under the selected tab.</p>
+        <table class="admin-table">
+          <thead><tr><th>Label</th><th>Category</th><th>URL / Embed</th><th>Actions</th></tr></thead>
+          <tbody id="admin-maps-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN RISE -->
+    <div id="ap-rise" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>RISE Agenda</h2><p>Edit the four-pillar strategic framework content</p></div>
+        <button class="btn-add" onclick="saveRISE()"><i class="ti ti-device-floppy"></i> Save All</button>
+      </div>
+      <div class="admin-card">
+        <div class="form-group"><label>Section Introduction</label><textarea id="rise-intro" rows="2" placeholder="Brief intro text for the RISE section..."></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:0.5rem">
+          <div style="border-left:3px solid #4fc87a;padding-left:12px">
+            <div class="form-group"><label>R — Title</label><input type="text" id="rise-r-title" placeholder="Resiliency"></div>
+            <div class="form-group"><label>R — Description</label><textarea id="rise-r-desc" rows="3"></textarea></div>
+          </div>
+          <div style="border-left:3px solid #5ab4f0;padding-left:12px">
+            <div class="form-group"><label>I — Title</label><input type="text" id="rise-i-title" placeholder="Inclusivity"></div>
+            <div class="form-group"><label>I — Description</label><textarea id="rise-i-desc" rows="3"></textarea></div>
+          </div>
+          <div style="border-left:3px solid #f0c040;padding-left:12px">
+            <div class="form-group"><label>S — Title</label><input type="text" id="rise-s-title" placeholder="Sustainability"></div>
+            <div class="form-group"><label>S — Description</label><textarea id="rise-s-desc" rows="3"></textarea></div>
+          </div>
+          <div style="border-left:3px solid #f07855;padding-left:12px">
+            <div class="form-group"><label>E — Title</label><input type="text" id="rise-e-title" placeholder="Excellence"></div>
+            <div class="form-group"><label>E — Description</label><textarea id="rise-e-desc" rows="3"></textarea></div>
+          </div>
+        </div>
+        <button class="btn-submit" style="margin-top:1rem" onclick="saveRISE()"><i class="ti ti-device-floppy"></i> Save RISE Content</button>
+      </div>
+    </div>
+
+    <!-- ADMIN ABOUT -->
+    <div id="ap-about" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>About / Profile</h2><p>Edit organizational description, vision, and mission</p></div>
+        <button class="btn-add" onclick="saveAbout()"><i class="ti ti-device-floppy"></i> Save All</button>
+      </div>
+      <div class="admin-card">
+        <div class="form-group"><label>Organization Name (navbar)</label><input type="text" id="about-orgname" placeholder="Agricultural Productivity Operations Office"></div>
+        <div class="form-group"><label>Organization Subtitle</label><input type="text" id="about-orgsub" placeholder="Cagayan de Oro City · Since 1961"></div>
+        <div class="form-group"><label>Hero Description</label><textarea id="about-herodesc" rows="3"></textarea></div>
+        <div class="form-group"><label>About Paragraph 1</label><textarea id="about-desc1" rows="3"></textarea></div>
+        <div class="form-group"><label>About Paragraph 2</label><textarea id="about-desc2" rows="3"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Vision</label><textarea id="about-vision" rows="3"></textarea></div>
+          <div class="form-group"><label>Mission</label><textarea id="about-mission" rows="3"></textarea></div>
+        </div>
+        <button class="btn-submit" onclick="saveAbout()"><i class="ti ti-device-floppy"></i> Save About Content</button>
+      </div>
+    </div>
+
+    <!-- ADMIN CONTACT -->
+    <div id="ap-contact" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>Contact Information</h2><p>Edit office contact details shown on the public site</p></div>
+        <button class="btn-add" onclick="saveContact()"><i class="ti ti-device-floppy"></i> Save All</button>
+      </div>
+      <div class="admin-card">
+        <div class="form-group"><label>Office Address</label><textarea id="contact-address" rows="2"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Telephone / Fax</label><input type="text" id="contact-phone" placeholder="(088) 856-0000 local 1234"></div>
+          <div class="form-group"><label>Email Address</label><input type="text" id="contact-email" placeholder="apoo@cdocity.gov.ph"></div>
+        </div>
+        <div class="form-group"><label>Office Hours</label><input type="text" id="contact-hours" placeholder="Monday – Friday, 8:00 AM – 5:00 PM"></div>
+        <div class="form-group"><label>Facebook Page URL (optional)</label><input type="text" id="contact-fb" placeholder="https://facebook.com/..."></div>
+        <button class="btn-submit" onclick="saveContact()"><i class="ti ti-device-floppy"></i> Save Contact Info</button>
+      </div>
+    </div>
+
+    <!-- ADMIN SETTINGS -->
+    <div id="ap-settings" class="admin-panel">
+      <div class="admin-topbar">
+        <div><h2>Settings</h2><p>System configuration and security</p></div>
+      </div>
+      <div class="admin-card">
+        <strong style="font-size:14px;color:var(--green-dark);display:block;margin-bottom:1rem">Change Admin Password</strong>
+        <div class="form-group"><label>Current Password</label><input type="password" id="pw-current"></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="pw-new"></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="pw-confirm"></div>
+        <button class="btn-submit" onclick="changePassword()"><i class="ti ti-lock"></i> Update Password</button>
+      </div>
+      <div class="admin-card" style="margin-top:1rem">
+        <strong style="font-size:14px;color:var(--green-dark);display:block;margin-bottom:1rem">Data Management</strong>
+        <div class="sync-box">
+          <div>
+            <strong style="font-size:13.5px;color:var(--green-dark);display:block">Google Sheet Connection</strong>
+            <span class="sync-status" id="sync-status">Checking connection...</span>
+          </div>
+          <div class="sync-actions">
+            <button class="btn-cancel" onclick="refreshRemoteData()"><i class="ti ti-refresh"></i> Reload Sheet Data</button>
+            <button class="btn-submit" onclick="syncAllData()"><i class="ti ti-cloud-upload"></i> Save All to Sheet</button>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Data is shared through Google Sheets when the Apps Script URL is set. This browser also keeps a backup copy in case the connection is unavailable.</p>
+        <button style="background:var(--red-light);color:var(--red);border:1px solid #f7c1c1;padding:9px 18px;border-radius:7px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:7px" onclick="resetData()"><i class="ti ti-trash"></i> Reset All Data</button>
+      </div>
+    </div>
+  </div><!-- end admin-main -->
+</div><!-- end admin view -->
+
+<!-- ===== MODALS ===== -->
+<!-- News Modal -->
+<div class="modal-overlay" id="modal-news">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('news')">&times;</button>
+    <h3 id="news-modal-title">Add News Article</h3>
+    <input type="hidden" id="news-edit-id">
+    <div class="form-group"><label>Headline / Title</label><input type="text" id="news-title" placeholder="Enter article headline"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Category</label>
+        <select id="news-category">
+          <option>Advisory</option><option>Program</option><option>Event</option>
+          <option>Report</option><option>Announcement</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Date</label><input type="date" id="news-date"></div>
+    </div>
+    <div class="form-group"><label>Summary / Body</label><textarea id="news-body" rows="4" placeholder="Enter article content or summary..."></textarea></div>
+    <div class="form-group">
+      <label>Featured Article?</label>
+      <select id="news-featured"><option value="0">No</option><option value="1">Yes (shows large)</option></select>
+    </div>
+    <div style="display:flex;align-items:center;margin-top:1rem">
+      <button class="btn-cancel" onclick="closeModal('news')">Cancel</button>
+      <button class="btn-submit" onclick="saveNews()"><i class="ti ti-device-floppy"></i> Save Article</button>
+    </div>
+  </div>
+</div>
+
+<!-- Price Modal -->
+<div class="modal-overlay" id="modal-price">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('price')">&times;</button>
+    <h3 id="price-modal-title">Add Commodity Price</h3>
+    <input type="hidden" id="price-edit-id">
+    <div class="form-row">
+      <div class="form-group"><label>Commodity Name</label><input type="text" id="price-name" placeholder="e.g. Rice (Premium)"></div>
+      <div class="form-group"><label>Category</label>
+        <select id="price-category">
+          <option>Rice / Grains</option><option>Vegetables</option><option>Fruits</option>
+          <option>Fish / Seafood</option><option>Livestock / Poultry</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Unit</label><input type="text" id="price-unit" placeholder="e.g. kg, piece, bundle"></div>
+      <div class="form-group"><label>Price Change</label>
+        <select id="price-change"><option value="up">Up &#9650;</option><option value="down">Down &#9660;</option><option value="same">No Change</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Farm Gate Price (&#8369;)</label><input type="number" id="price-farmgate" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="form-group"><label>Retail Price (&#8369;)</label><input type="number" id="price-retail" placeholder="0.00" step="0.01" min="0"></div>
+    </div>
+    <div style="display:flex;align-items:center;margin-top:1rem">
+      <button class="btn-cancel" onclick="closeModal('price')">Cancel</button>
+      <button class="btn-submit" onclick="savePrice()"><i class="ti ti-device-floppy"></i> Save Price</button>
+    </div>
+  </div>
+</div>
+
+<!-- Map Modal -->
+<div class="modal-overlay" id="modal-map">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('map')">&times;</button>
+    <h3 id="map-modal-title">Add Map Link</h3>
+    <input type="hidden" id="map-edit-id">
+    <div class="form-group"><label>Map Label</label><input type="text" id="map-label" placeholder="e.g. Agri Production Sites 2026"></div>
+    <div class="form-group"><label>Category / Tab</label>
+      <select id="map-category">
+        <option value="agri">Agri Production Sites</option>
+        <option value="market">Market Locations</option>
+        <option value="project">Project Areas</option>
+        <option value="fishery">Fishery Zones</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Google Maps / Embed URL</label><input type="text" id="map-url" placeholder="https://www.google.com/maps/embed?..."></div>
+    <p style="font-size:12px;color:var(--muted);margin-top:-6px">Tip: In Google Maps, click Share &rarr; Embed a map &rarr; copy the src="..." URL only.</p>
+    <div style="display:flex;align-items:center;margin-top:1rem">
+      <button class="btn-cancel" onclick="closeModal('map')">Cancel</button>
+      <button class="btn-submit" onclick="saveMap()"><i class="ti ti-device-floppy"></i> Save Map</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA LAYER — Google Sheet + local backup
+// ============================================================
+// Paste your deployed Google Apps Script Web App URL here after creating it.
+// Example: const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfy.../exec";
+const GOOGLE_SCRIPT_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const PRICE_MONITOR_URL = "https://script.google.com/macros/s/AKfycbzAUccUL_j2_O7R97RbYTqLxh2gKJ_512n8pcI5aPq57zjk34YYcackIHvSXgrv9XUI/exec";
+
+const KEYS = {
+  news:'apoo_news', prices:'apoo_prices', sd:'apoo_sd', maps:'apoo_maps',
+  rise:'apoo_rise', about:'apoo_about', contact:'apoo_contact', pw:'apoo_pw'
+};
+
+const MARKET_NAMES = {
+  bulua:'Bulua Market', carmen:'Carmen Market', cogon:'Cogon Market',
+  puerto:'Puerto Market', other:'Other Markets'
+};
+
+const PRICE_MONITOR_ITEMS = [
+  {id:'rice_sp_imp',name:'Imported Special Rice',unit:'kg',category:'Rice'},
+  {id:'rice_pr_imp',name:'Imported Premium Rice',unit:'kg',category:'Rice'},
+  {id:'rice_wm_imp',name:'Imported Well Milled Rice',unit:'kg',category:'Rice'},
+  {id:'rice_rm_imp',name:'Imported Regular Milled Rice',unit:'kg',category:'Rice'},
+  {id:'rice_sp_loc',name:'Local Special Rice',unit:'kg',category:'Rice'},
+  {id:'rice_pr_loc',name:'Local Premium Rice',unit:'kg',category:'Rice'},
+  {id:'rice_wm_loc',name:'Local Well Milled Rice',unit:'kg',category:'Rice'},
+  {id:'rice_rm_loc',name:'Local Regular Milled Rice',unit:'kg',category:'Rice'},
+  {id:'fish_bangus',name:'Bangus',unit:'kg',category:'Fish'},
+  {id:'fish_tilapia',name:'Tilapia',unit:'kg',category:'Fish'},
+  {id:'fish_gal_loc',name:'Galunggong (Local)',unit:'kg',category:'Fish'},
+  {id:'fish_gal_imp',name:'Galunggong (Imported)',unit:'kg',category:'Fish'},
+  {id:'fish_alu',name:'Alumahan',unit:'kg',category:'Fish'},
+  {id:'meat_beef_rump',name:'Beef Rump',unit:'kg',category:'Livestock / Poultry'},
+  {id:'meat_beef_bris',name:'Beef Brisket',unit:'kg',category:'Livestock / Poultry'},
+  {id:'meat_pork_kas',name:'Pork Kasim',unit:'kg',category:'Livestock / Poultry'},
+  {id:'meat_pork_lie',name:'Pork Liempo',unit:'kg',category:'Livestock / Poultry'},
+  {id:'meat_chicken',name:'Whole Chicken',unit:'pc',category:'Livestock / Poultry'},
+  {id:'meat_egg',name:'Chicken Egg',unit:'pc',category:'Livestock / Poultry'},
+  {id:'vl_ampalaya',name:'Ampalaya',unit:'kg',category:'Vegetables'},
+  {id:'vl_sitao',name:'Sitao',unit:'kg',category:'Vegetables'},
+  {id:'vl_pechay',name:'Pechay (Native)',unit:'kg',category:'Vegetables'},
+  {id:'vl_cucumber',name:'Cucumber',unit:'kg',category:'Vegetables'},
+  {id:'vl_okra',name:'Okra',unit:'kg',category:'Vegetables'},
+  {id:'vl_squash',name:'Squash',unit:'kg',category:'Vegetables'},
+  {id:'vl_eggplant',name:'Eggplant',unit:'kg',category:'Vegetables'},
+  {id:'vl_patola',name:'Patola',unit:'kg',category:'Vegetables'},
+  {id:'vl_tomato',name:'Tomato',unit:'kg',category:'Vegetables'},
+  {id:'vh_cabbage',name:'Cabbage',unit:'kg',category:'Vegetables'},
+  {id:'vh_carrots',name:'Carrots',unit:'kg',category:'Vegetables'},
+  {id:'vh_habitc',name:'Habitchuelas',unit:'kg',category:'Vegetables'},
+  {id:'vh_potato',name:'White Potato',unit:'kg',category:'Vegetables'},
+  {id:'vh_bellp',name:'Atsal (Bell Pepper)',unit:'kg',category:'Vegetables'},
+  {id:'vh_chayote',name:'Chayote',unit:'kg',category:'Vegetables'},
+  {id:'sp_redonion',name:'Red Onion (Local)',unit:'kg',category:'Spices'},
+  {id:'sp_redonion_imp',name:'Red Onion (Imported)',unit:'kg',category:'Spices'},
+  {id:'sp_whiteonion',name:'White Onion (Local)',unit:'kg',category:'Spices'},
+  {id:'sp_whiteonion_imp',name:'White Onion (Imported)',unit:'kg',category:'Spices'},
+  {id:'sp_garlic_imp',name:'Garlic (Imported)',unit:'kg',category:'Spices'},
+  {id:'sp_garlic_nat',name:'Garlic (Native)',unit:'kg',category:'Spices'},
+  {id:'sp_ginger',name:'Ginger',unit:'kg',category:'Spices'},
+  {id:'sp_labuyo',name:'Chilli (Labuyo)',unit:'kg',category:'Spices'},
+  {id:'sp_sili',name:'Sili (Bisaya)',unit:'kg',category:'Spices'},
+  {id:'fr_calamansi',name:'Calamansi',unit:'kg',category:'Fruits'},
+  {id:'fr_saba',name:'Banana (Saba)',unit:'kg',category:'Fruits'},
+  {id:'fr_lakatan',name:'Banana (Lakatan)',unit:'kg',category:'Fruits'},
+  {id:'fr_latundan',name:'Banana (Latundan)',unit:'kg',category:'Fruits'},
+  {id:'fr_papaya',name:'Papaya',unit:'kg',category:'Fruits'},
+  {id:'fr_mango',name:'Mango (Carabao)',unit:'kg',category:'Fruits'},
+  {id:'fr_avocado',name:'Avocado',unit:'kg',category:'Fruits'},
+  {id:'ot_sugar_ref',name:'Sugar (Refined)',unit:'kg',category:'Other'},
+  {id:'ot_sugar_wash',name:'Sugar (Washed)',unit:'kg',category:'Other'},
+  {id:'ot_sugar_brn',name:'Sugar (Brown)',unit:'kg',category:'Other'},
+  {id:'ot_oil_350',name:'Cooking Oil (Palm, 350ml)',unit:'btl',category:'Other'},
+  {id:'ot_oil_1l',name:'Cooking Oil (Palm, 1L)',unit:'btl',category:'Other'},
+  {id:'ot_corn10',name:'White Corn Grits #10',unit:'kg',category:'Other'},
+  {id:'ot_corn12',name:'White Corn Grits #12',unit:'kg',category:'Other'},
+  {id:'ot_camote',name:'Sweet Potato',unit:'kg',category:'Other'},
+  {id:'ot_cassava',name:'Cassava',unit:'kg',category:'Other'},
+  {id:'ot_gabi',name:'Taro (Gabi)',unit:'kg',category:'Other'}
+];
+
+let MARKET_SUMMARY = null;
+
+const STORAGE_TO_DATA_KEY = Object.fromEntries(Object.entries(KEYS).map(([dataKey, storageKey]) => [storageKey, dataKey]));
+const REMOTE_ENABLED = GOOGLE_SCRIPT_URL && !GOOGLE_SCRIPT_URL.includes('PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE');
+
+function load(key){ try{ return JSON.parse(localStorage.getItem(key)) || null }catch{ return null } }
+function saveLocal(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+function deepClone(val){ return JSON.parse(JSON.stringify(val)); }
+
+const DEFAULTS = {
+  news:[
+    {id:1,title:"2nd Quarter Crop Production Report Now Available",category:"Report",date:"2026-06-01",body:"The regional production data for major crops including palay, corn, and high-value vegetables has been released. Total production increased by 8.3% compared to the same period last year, with Cagayan de Oro leading in corn and banana production.",featured:"1"},
+    {id:2,title:"Palay Buying Price Adjustment Effective June 2026",category:"Advisory",date:"2026-05-28",body:"NFA adjusts buying prices for dry and wet palay across all buying stations in the region.",featured:"0"},
+    {id:3,title:"Free Fingerling Distribution for Registered Fish Farmers",category:"Program",date:"2026-05-25",body:"BFAR schedules distribution of bangus and tilapia fingerlings for Q3 2026 beneficiaries.",featured:"0"}
+  ],
+  prices:[
+    {id:1,name:"Rice (Premium)",category:"Rice / Grains",unit:"kg",farmgate:"42.00",retail:"52.00",change:"up"},
+    {id:2,name:"Tilapia",category:"Fish / Seafood",unit:"kg",farmgate:"110.00",retail:"130.00",change:"down"},
+    {id:3,name:"Corn (Yellow)",category:"Rice / Grains",unit:"kg",farmgate:"18.00",retail:"22.50",change:"up"},
+    {id:4,name:"Bangus",category:"Fish / Seafood",unit:"kg",farmgate:"150.00",retail:"180.00",change:"up"},
+    {id:5,name:"Tomato",category:"Vegetables",unit:"kg",farmgate:"35.00",retail:"45.00",change:"down"},
+    {id:6,name:"Eggplant",category:"Vegetables",unit:"kg",farmgate:"22.00",retail:"30.00",change:"up"}
+  ],
+  sd:{production:"124,580 MT",prodTrend:"+8.3% vs last quarter",farmers:"18,204",farmTrend:"+1.2% this quarter",avgprice:"₱24.80/kg",priceTrend:"-0.5% vs last week",markets:"37",mktTrend:"3 new this quarter",summary:"Supply is generally adequate for most commodities. Demand for fish commodities remains high due to seasonal factors. Vegetable supply is expected to increase in Q3 as production areas are harvested."},
+  maps:[],
+  rise:{intro:"Our four-pillar development framework guiding agri-fisheries programs in Cagayan de Oro City.",rTitle:"REGIONAL LEADERSHIP: METROPOLIZATION, ACCESSIBILITY, AND CONNECTIVITY",rDesc:"Building climate-adaptive and disaster-resilient farming and fishing communities.",iTitle:"INSTITUTIONAL DEVELOPMENT AND PARTICIPATORY GOVERNANCE",iDesc:"Ensuring equitable access to support services for smallholder farmers and fisherfolk.",sTitle:"SAFETY, SECURITY, AND HUMAN DEVELOPMENT",sDesc:"Promoting responsible resource use and environmentally sound agricultural practices.",eTitle:"ECONOMIC RECOVERY",eDesc:"Delivering high-quality public service through data-driven programs and innovation."},
+  about:{orgName:"Agricultural Productivity Operations Office",orgSub:"Cagayan de Oro City · Since 1961",heroDesc:"Serving the farmers, fisherfolk, and consumers of the City of Golden Friendship. Access commodity prices, production data, maps, and agricultural programs — all in one place.",desc1:"The Agricultural Productivity Operations Office (APOO) of Cagayan de Oro City is the local government unit mandated to promote, develop, and regulate agriculture and fisheries since 1961 — ensuring food security and the welfare of farmers and fisherfolk in the City of Golden Friendship.",desc2:"APOO provides extension services, technical assistance, market information, and direct support programs to more than 18,000 registered farmers and fisherfolk across all 80 barangays of the city.",vision:"A food-secure and prosperous Cagayan de Oro with resilient and sustainable agriculture and fisheries sectors.",mission:"To provide effective support services enabling equitable and sustainable agri-fishery development for the city's farming and fishing communities."},
+  contact:{address:"APOO Building, City Hall Compound, Cagayan de Oro City, Misamis Oriental",phone:"(088) 856-0000 local 1234",email:"apoo@cdocity.gov.ph",hours:"Monday – Friday, 8:00 AM – 5:00 PM",fb:""}
+};
+
+let APP_DATA = {};
+
+function buildLocalData(){
+  const data = deepClone(DEFAULTS);
+  Object.keys(KEYS).forEach(key => {
+    const localValue = load(KEYS[key]);
+    if(localValue !== null) data[key] = localValue;
+  });
+  return data;
+}
+
+function mergeRemoteData(remoteData){
+  const data = buildLocalData();
+  if(remoteData && typeof remoteData === 'object'){
+    Object.keys(KEYS).forEach(key => {
+      if(remoteData[key] !== undefined && remoteData[key] !== null && remoteData[key] !== ''){
+        data[key] = remoteData[key];
+        saveLocal(KEYS[key], remoteData[key]);
+      }
+    });
+  }
+  APP_DATA = data;
+}
+
+function getData(key){ return deepClone(APP_DATA[key] !== undefined ? APP_DATA[key] : DEFAULTS[key]); }
+function getNextId(arr){ return arr.length ? Math.max(...arr.map(x=>x.id))+1 : 1; }
+
+function save(key,val){
+  saveLocal(key, val);
+  const dataKey = STORAGE_TO_DATA_KEY[key];
+  if(dataKey){
+    APP_DATA[dataKey] = deepClone(val);
+    saveRemoteKey(dataKey, val);
+  }
+}
+
+function setSyncStatus(message, type=''){
+  const el = document.getElementById('sync-status');
+  if(!el) return;
+  el.textContent = message;
+  el.className = 'sync-status' + (type ? ' '+type : '');
+}
+
+async function loadRemoteData({silent=false} = {}){
+  mergeRemoteData(null);
+  if(!REMOTE_ENABLED){
+    setSyncStatus('Google Script URL is not set. Using local backup only.', 'error');
+    return;
+  }
+  if(!silent) setSyncStatus('Loading data from Google Sheet...');
+  try{
+    const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAll&t=${Date.now()}`, {method:'GET'});
+    const json = await res.json();
+    if(json.status !== 'success') throw new Error(json.message || 'Unable to read Google Sheet');
+    mergeRemoteData(json.data || {});
+    setSyncStatus('Connected to Google Sheet', 'online');
+  }catch(err){
+    console.error(err);
+    setSyncStatus('Could not connect. Using local backup.', 'error');
+    if(!silent) toast('Could not connect to Google Sheet. Local backup loaded.', 'error');
+  }
+}
+
+async function saveRemoteKey(dataKey, value){
+  if(!REMOTE_ENABLED) return;
+  setSyncStatus('Saving to Google Sheet...');
+  try{
+    const res = await fetch(GOOGLE_SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveKey', key:dataKey, value})
+    });
+    const json = await res.json();
+    if(json.status !== 'success') throw new Error(json.message || 'Unable to save');
+    setSyncStatus('Saved to Google Sheet', 'online');
+  }catch(err){
+    console.error(err);
+    setSyncStatus('Save failed. Local backup was kept.', 'error');
+    toast('Google Sheet save failed. Local backup was kept.', 'error');
+  }
+}
+
+async function syncAllData(){
+  Object.keys(KEYS).forEach(key => saveLocal(KEYS[key], APP_DATA[key]));
+  if(!REMOTE_ENABLED){
+    setSyncStatus('Google Script URL is not set. Using local backup only.', 'error');
+    toast('Add your Google Apps Script URL first.', 'error');
+    return;
+  }
+  setSyncStatus('Saving all data to Google Sheet...');
+  try{
+    const res = await fetch(GOOGLE_SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveAll', data:APP_DATA})
+    });
+    const json = await res.json();
+    if(json.status !== 'success') throw new Error(json.message || 'Unable to save all data');
+    setSyncStatus('All data saved to Google Sheet', 'online');
+    toast('All data saved to Google Sheet');
+  }catch(err){
+    console.error(err);
+    setSyncStatus('Save failed. Local backup was kept.', 'error');
+    toast('Google Sheet save failed. Local backup was kept.', 'error');
+  }
+}
+
+async function refreshRemoteData(){
+  await loadRemoteData();
+  renderAdmin();
+  renderPublic();
+  toast('Latest Google Sheet data loaded');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function esc(str){ 
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function formatDate(d){
+  if(!d) return '';
+  try{
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'});
+  }catch{ return d; }
+}
+
+function scrollToSection(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type=''){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'show' + (type ? ' '+type : '');
+  setTimeout(()=>{ t.className=''; }, 2800);
+}
+
+// ============================================================
+// VIEW ROUTING
+// ============================================================
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>{
+    el.classList.remove('active');
+    el.style.display = 'none';
+  });
+  const el = document.getElementById('view-'+v);
+  if(el){
+    el.style.display = (v==='admin') ? 'flex' : 'block';
+    el.classList.add('active');
+  }
+}
+
+function showLogin(){ showView('login'); }
+function showPublic(){ showView('public'); renderPublic(); }
+function showAdmin(){ showView('admin'); renderAdmin(); }
+
+// ============================================================
+// AUTH
+// ============================================================
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const storedPw = getData('pw') || 'apoo2026';
+  if(u === 'admin' && p === storedPw){
+    document.getElementById('login-err').style.display = 'none';
+    showAdmin();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') doLogin();
+});
+
+function doLogout(){ showLogin(); }
+
+function changePassword(){
+  const cur = document.getElementById('pw-current').value;
+  const nw  = document.getElementById('pw-new').value;
+  const cn  = document.getElementById('pw-confirm').value;
+  const stored = getData('pw') || 'apoo2026';
+  if(cur !== stored){ toast('Current password is incorrect','error'); return; }
+  if(!nw){ toast('New password cannot be empty','error'); return; }
+  if(nw !== cn){ toast('Passwords do not match','error'); return; }
+  save(KEYS.pw, nw);
+  ['pw-current','pw-new','pw-confirm'].forEach(id => document.getElementById(id).value='');
+  toast('Password updated successfully');
+}
+
+function resetData(){
+  if(!confirm('This will reset all content to defaults on this device and in the connected Google Sheet. Are you sure?')) return;
+  Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+  APP_DATA = deepClone(DEFAULTS);
+  syncAllData();
+  renderAdmin();
+  renderPublic();
+  toast('All data reset to defaults');
+}
+
+// ============================================================
+// ADMIN PANELS
+// ============================================================
+function showAdminPanel(name){
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-nav-item').forEach(i => i.classList.remove('active'));
+  const panel = document.getElementById('ap-'+name);
+  if(panel) panel.classList.add('active');
+  document.querySelectorAll('.admin-nav-item').forEach(i=>{
+    const oc = i.getAttribute('onclick') || '';
+    if(oc.includes("'"+name+"'")) i.classList.add('active');
+  });
+  if(name==='news') renderAdminNews();
+  if(name==='prices') renderAdminPrices();
+  if(name==='maps') renderAdminMaps();
+  if(name==='rise') loadRISEForm();
+  if(name==='about') loadAboutForm();
+  if(name==='contact') loadContactForm();
+  if(name==='supplydemand') loadSDForm();
+  if(name==='dashboard') renderAdminDash();
+}
+
+function renderAdmin(){
+  renderAdminDash();
+  renderAdminNews();
+  renderAdminPrices();
+  renderAdminMaps();
+  loadRISEForm();
+  loadAboutForm();
+  loadContactForm();
+  loadSDForm();
+}
+
+function renderAdminDash(){
+  const n=getData('news'), p=getData('prices'), s=getData('sd'), m=getData('maps');
+  document.getElementById('adash-news').textContent = n.length;
+  document.getElementById('adash-prices').textContent = p.length;
+  document.getElementById('adash-sd').textContent = s.production ? 1 : 0;
+  document.getElementById('adash-maps').textContent = m.length;
+}
+
+// ============================================================
+// NEWS ADMIN
+// ============================================================
+function renderAdminNews(){
+  const news = getData('news');
+  const tbody = document.getElementById('admin-news-tbody');
+  if(!news.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:1.5rem">No articles yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = news.map(n=>`
+    <tr>
+      <td style="max-width:240px;font-weight:500">${esc(n.title)}</td>
+      <td><span class="badge badge-green">${esc(n.category)}</span></td>
+      <td>${formatDate(n.date)}</td>
+      <td>${n.featured==='1' ? '<span class="badge badge-gold">Yes</span>' : '<span style="color:var(--muted);font-size:12px">No</span>'}</td>
+      <td><div class="tbl-actions">
+        <button class="btn-edit" onclick="editNews(${n.id})"><i class="ti ti-edit"></i> Edit</button>
+        <button class="btn-del" onclick="deleteNews(${n.id})"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function openModal(type){
+  if(type==='news'){
+    document.getElementById('news-edit-id').value = '';
+    document.getElementById('news-modal-title').textContent = 'Add News Article';
+    ['news-title','news-body'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('news-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('news-category').value = 'Advisory';
+    document.getElementById('news-featured').value = '0';
+  }
+  if(type==='price'){
+    document.getElementById('price-edit-id').value = '';
+    document.getElementById('price-modal-title').textContent = 'Add Commodity Price';
+    ['price-name','price-unit','price-farmgate','price-retail'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('price-category').value = 'Rice / Grains';
+    document.getElementById('price-change').value = 'up';
+  }
+  if(type==='map'){
+    document.getElementById('map-edit-id').value = '';
+    document.getElementById('map-modal-title').textContent = 'Add Map Link';
+    ['map-label','map-url'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('map-category').value = 'agri';
+  }
+  document.getElementById('modal-'+type).classList.add('open');
+}
+
+function closeModal(type){ document.getElementById('modal-'+type).classList.remove('open'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click', e=>{
+    if(e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+function saveNews(){
+  const title = document.getElementById('news-title').value.trim();
+  const body  = document.getElementById('news-body').value.trim();
+  const date  = document.getElementById('news-date').value;
+  const cat   = document.getElementById('news-category').value;
+  const feat  = document.getElementById('news-featured').value;
+  const eid   = document.getElementById('news-edit-id').value;
+  if(!title){ toast('Please enter a headline','error'); return; }
+  let news = getData('news');
+  if(eid){
+    news = news.map(n => n.id==eid ? {...n,title,body,date,category:cat,featured:feat} : n);
+    toast('Article updated');
+  } else {
+    news.push({id:getNextId(news),title,body,date,category:cat,featured:feat});
+    toast('Article saved');
+  }
+  save(KEYS.news, news);
+  closeModal('news');
+  renderAdminNews();
+  renderPublicNews();
+}
+
+function editNews(id){
+  const n = getData('news').find(x => x.id===id);
+  if(!n) return;
+  document.getElementById('news-edit-id').value = id;
+  document.getElementById('news-modal-title').textContent = 'Edit News Article';
+  document.getElementById('news-title').value = n.title;
+  document.getElementById('news-body').value = n.body || '';
+  document.getElementById('news-date').value = n.date;
+  document.getElementById('news-category').value = n.category;
+  document.getElementById('news-featured').value = n.featured || '0';
+  document.getElementById('modal-news').classList.add('open');
+}
+
+function deleteNews(id){
+  if(!confirm('Delete this article?')) return;
+  save(KEYS.news, getData('news').filter(n => n.id!==id));
+  renderAdminNews();
+  renderPublicNews();
+  toast('Article deleted');
+}
+
+// ============================================================
+// PRICES ADMIN
+// ============================================================
+function renderAdminPrices(){
+  const prices = getData('prices');
+  const tbody = document.getElementById('admin-prices-tbody');
+  if(!prices.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:1.5rem">No commodities yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = prices.map(p=>`
+    <tr>
+      <td style="font-weight:500">${esc(p.name)}</td>
+      <td><span class="badge badge-green">${esc(p.category)}</span></td>
+      <td>${esc(p.unit)}</td>
+      <td>&#8369;${esc(p.farmgate)}</td>
+      <td>&#8369;${esc(p.retail)}</td>
+      <td>${p.change==='up' ? '<span class="price-up-cell">&#9650; Up</span>' : p.change==='down' ? '<span class="price-down-cell">&#9660; Down</span>' : '<span class="price-same">&#8212; Same</span>'}</td>
+      <td style="font-size:12px;color:var(--muted)">Today</td>
+      <td><div class="tbl-actions">
+        <button class="btn-edit" onclick="editPrice(${p.id})"><i class="ti ti-edit"></i> Edit</button>
+        <button class="btn-del" onclick="deletePrice(${p.id})"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function savePrice(){
+  const name = document.getElementById('price-name').value.trim();
+  const cat  = document.getElementById('price-category').value;
+  const unit = document.getElementById('price-unit').value.trim();
+  const fg   = document.getElementById('price-farmgate').value;
+  const ret  = document.getElementById('price-retail').value;
+  const chg  = document.getElementById('price-change').value;
+  const eid  = document.getElementById('price-edit-id').value;
+  if(!name){ toast('Please enter a commodity name','error'); return; }
+  let prices = getData('prices');
+  if(eid){
+    prices = prices.map(p => p.id==eid ? {...p,name,category:cat,unit,farmgate:fg,retail:ret,change:chg} : p);
+    toast('Commodity updated');
+  } else {
+    prices.push({id:getNextId(prices),name,category:cat,unit,farmgate:fg,retail:ret,change:chg});
+    toast('Commodity added');
+  }
+  save(KEYS.prices, prices);
+  closeModal('price');
+  renderAdminPrices();
+  renderPublicPrices();
+  renderTicker();
+}
+
+function editPrice(id){
+  const p = getData('prices').find(x => x.id===id);
+  if(!p) return;
+  document.getElementById('price-edit-id').value = id;
+  document.getElementById('price-modal-title').textContent = 'Edit Commodity Price';
+  document.getElementById('price-name').value = p.name;
+  document.getElementById('price-category').value = p.category;
+  document.getElementById('price-unit').value = p.unit;
+  document.getElementById('price-farmgate').value = p.farmgate;
+  document.getElementById('price-retail').value = p.retail;
+  document.getElementById('price-change').value = p.change;
+  document.getElementById('modal-price').classList.add('open');
+}
+
+function deletePrice(id){
+  if(!confirm('Delete this commodity?')) return;
+  save(KEYS.prices, getData('prices').filter(p => p.id!==id));
+  renderAdminPrices();
+  renderPublicPrices();
+  renderTicker();
+  toast('Commodity deleted');
+}
+
+// ============================================================
+// MAPS ADMIN
+// ============================================================
+function renderAdminMaps(){
+  const maps = getData('maps');
+  const tbody = document.getElementById('admin-maps-tbody');
+  if(!maps.length){
+    tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem">No map links yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = maps.map(m=>`
+    <tr>
+      <td style="font-weight:500">${esc(m.label)}</td>
+      <td><span class="badge badge-green">${esc(m.category)}</span></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)">${esc(m.url)}</td>
+      <td><div class="tbl-actions">
+        <button class="btn-edit" onclick="editMap(${m.id})"><i class="ti ti-edit"></i> Edit</button>
+        <button class="btn-del" onclick="deleteMap(${m.id})"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
+}
+
+function saveMap(){
+  const label = document.getElementById('map-label').value.trim();
+  const cat   = document.getElementById('map-category').value;
+  const url   = document.getElementById('map-url').value.trim();
+  const eid   = document.getElementById('map-edit-id').value;
+  if(!label){ toast('Please enter a map label','error'); return; }
+  if(!url){ toast('Please enter a map URL','error'); return; }
+  let maps = getData('maps');
+  if(eid){
+    maps = maps.map(m => m.id==eid ? {...m,label,category:cat,url} : m);
+    toast('Map updated');
+  } else {
+    maps.push({id:getNextId(maps),label,category:cat,url});
+    toast('Map added');
+  }
+  save(KEYS.maps, maps);
+  closeModal('map');
+  renderAdminMaps();
+  renderAdminDash();
+}
+
+function editMap(id){
+  const m = getData('maps').find(x => x.id===id);
+  if(!m) return;
+  document.getElementById('map-edit-id').value = id;
+  document.getElementById('map-modal-title').textContent = 'Edit Map Link';
+  document.getElementById('map-label').value = m.label;
+  document.getElementById('map-category').value = m.category;
+  document.getElementById('map-url').value = m.url;
+  document.getElementById('modal-map').classList.add('open');
+}
+
+function deleteMap(id){
+  if(!confirm('Delete this map link?')) return;
+  save(KEYS.maps, getData('maps').filter(m => m.id!==id));
+  renderAdminMaps();
+  renderAdminDash();
+  toast('Map deleted');
+}
+
+// ============================================================
+// SUPPLY & DEMAND
+// ============================================================
+function loadSDForm(){
+  const sd = getData('sd');
+  document.getElementById('sd-production').value  = sd.production  || '';
+  document.getElementById('sd-prod-trend').value  = sd.prodTrend   || '';
+  document.getElementById('sd-farmers').value     = sd.farmers     || '';
+  document.getElementById('sd-farm-trend').value  = sd.farmTrend   || '';
+  document.getElementById('sd-avgprice').value    = sd.avgprice    || '';
+  document.getElementById('sd-price-trend').value = sd.priceTrend  || '';
+  document.getElementById('sd-markets').value     = sd.markets     || '';
+  document.getElementById('sd-mkt-trend').value   = sd.mktTrend    || '';
+  document.getElementById('sd-summary').value     = sd.summary     || '';
+}
+
+function saveSDData(){
+  const sd = {
+    production : document.getElementById('sd-production').value.trim(),
+    prodTrend  : document.getElementById('sd-prod-trend').value.trim(),
+    farmers    : document.getElementById('sd-farmers').value.trim(),
+    farmTrend  : document.getElementById('sd-farm-trend').value.trim(),
+    avgprice   : document.getElementById('sd-avgprice').value.trim(),
+    priceTrend : document.getElementById('sd-price-trend').value.trim(),
+    markets    : document.getElementById('sd-markets').value.trim(),
+    mktTrend   : document.getElementById('sd-mkt-trend').value.trim(),
+    summary    : document.getElementById('sd-summary').value.trim()
+  };
+  save(KEYS.sd, sd);
+  renderPublicDash();
+  toast('Dashboard data saved');
+}
+
+// ============================================================
+// RISE
+// ============================================================
+function loadRISEForm(){
+  const r = getData('rise');
+  document.getElementById('rise-intro').value   = r.intro   || '';
+  document.getElementById('rise-r-title').value = r.rTitle  || '';
+  document.getElementById('rise-r-desc').value  = r.rDesc   || '';
+  document.getElementById('rise-i-title').value = r.iTitle  || '';
+  document.getElementById('rise-i-desc').value  = r.iDesc   || '';
+  document.getElementById('rise-s-title').value = r.sTitle  || '';
+  document.getElementById('rise-s-desc').value  = r.sDesc   || '';
+  document.getElementById('rise-e-title').value = r.eTitle  || '';
+  document.getElementById('rise-e-desc').value  = r.eDesc   || '';
+}
+
+function saveRISE(){
+  const r = {
+    intro  : document.getElementById('rise-intro').value.trim(),
+    rTitle : document.getElementById('rise-r-title').value.trim(),
+    rDesc  : document.getElementById('rise-r-desc').value.trim(),
+    iTitle : document.getElementById('rise-i-title').value.trim(),
+    iDesc  : document.getElementById('rise-i-desc').value.trim(),
+    sTitle : document.getElementById('rise-s-title').value.trim(),
+    sDesc  : document.getElementById('rise-s-desc').value.trim(),
+    eTitle : document.getElementById('rise-e-title').value.trim(),
+    eDesc  : document.getElementById('rise-e-desc').value.trim()
+  };
+  save(KEYS.rise, r);
+  renderPublicRISE();
+  toast('RISE content saved');
+}
+
+// ============================================================
+// ABOUT
+// ============================================================
+function loadAboutForm(){
+  const a = getData('about');
+  document.getElementById('about-orgname').value   = a.orgName  || '';
+  document.getElementById('about-orgsub').value    = a.orgSub   || '';
+  document.getElementById('about-herodesc').value  = a.heroDesc || '';
+  document.getElementById('about-desc1').value     = a.desc1    || '';
+  document.getElementById('about-desc2').value     = a.desc2    || '';
+  document.getElementById('about-vision').value    = a.vision   || '';
+  document.getElementById('about-mission').value   = a.mission  || '';
+}
+
+function saveAbout(){
+  const a = {
+    orgName  : document.getElementById('about-orgname').value.trim(),
+    orgSub   : document.getElementById('about-orgsub').value.trim(),
+    heroDesc : document.getElementById('about-herodesc').value.trim(),
+    desc1    : document.getElementById('about-desc1').value.trim(),
+    desc2    : document.getElementById('about-desc2').value.trim(),
+    vision   : document.getElementById('about-vision').value.trim(),
+    mission  : document.getElementById('about-mission').value.trim()
+  };
+  save(KEYS.about, a);
+  renderPublicAbout();
+  toast('About content saved');
+}
+
+// ============================================================
+// CONTACT
+// ============================================================
+function loadContactForm(){
+  const c = getData('contact');
+  document.getElementById('contact-address').value = c.address || '';
+  document.getElementById('contact-phone').value   = c.phone   || '';
+  document.getElementById('contact-email').value   = c.email   || '';
+  document.getElementById('contact-hours').value   = c.hours   || '';
+  document.getElementById('contact-fb').value      = c.fb      || '';
+}
+
+function saveContact(){
+  const c = {
+    address : document.getElementById('contact-address').value.trim(),
+    phone   : document.getElementById('contact-phone').value.trim(),
+    email   : document.getElementById('contact-email').value.trim(),
+    hours   : document.getElementById('contact-hours').value.trim(),
+    fb      : document.getElementById('contact-fb').value.trim()
+  };
+  save(KEYS.contact, c);
+  renderPublicContact();
+  toast('Contact info saved');
+}
+
+// ============================================================
+// PUBLIC RENDERERS
+// ============================================================
+function renderPublic(){
+  renderPublicAbout();
+  renderPublicNews();
+  renderPublicPrices();
+  renderPublicDash();
+  renderMarketMonitorSummary();
+  renderPublicRISE();
+  renderPublicContact();
+  renderTicker();
+  setMapTab(document.querySelector('.mt.active') || document.querySelector('.mt'), 'agri');
+}
+
+function renderPublicAbout(){
+  const a = getData('about');
+  setText('pub-org-name',  a.orgName);
+  setText('pub-org-sub',   a.orgSub);
+  setText('pub-hero-desc', a.heroDesc);
+  setText('pub-about-desc',a.desc1);
+  setText('pub-about-desc2',a.desc2);
+  setText('pub-vision',    a.vision);
+  setText('pub-mission',   a.mission);
+}
+
+function setText(id, val){
+  const el = document.getElementById(id);
+  if(el && val) el.textContent = val;
+}
+
+function renderPublicNews(){
+  const news = getData('news');
+  const container = document.getElementById('pub-news-container');
+  if(!news.length){
+    container.innerHTML='<div class="empty-state"><i class="ti ti-news"></i>No news articles yet.</div>';
+    return;
+  }
+  const featured = news.filter(n=>n.featured==='1');
+  const regular  = news.filter(n=>n.featured!=='1');
+  let html = '<div class="news-grid">';
+
+  if(featured.length){
+    const f = featured[0];
+    html += `<div class="news-feat">
+      <div class="news-feat-tag">${esc(f.category)}</div>
+      <h3>${esc(f.title)}</h3>
+      <p>${esc(f.body)}</p>
+      <div class="news-meta"><i class="ti ti-calendar" style="font-size:11px"></i>${formatDate(f.date)}</div>
+    </div>`;
+  } else {
+    html += '<div></div>';
+  }
+
+  html += '<div class="news-list">';
+  const listItems = featured.slice(1).concat(regular);
+  if(!listItems.length){
+    html += '<div class="empty-state" style="height:100%;min-height:80px"><span style="font-size:12.5px;color:var(--muted)">No additional articles.</span></div>';
+  } else {
+    listItems.forEach(n=>{
+      html += `<div class="news-item">
+        <div class="news-item-tag">${esc(n.category)}</div>
+        <h4>${esc(n.title)}</h4>
+        <div class="meta"><i class="ti ti-calendar" style="font-size:10px"></i> ${formatDate(n.date)}</div>
+      </div>`;
+    });
+  }
+  html += '</div></div>';
+  container.innerHTML = html;
+}
+
+function renderPublicPrices(){
+  const prices = getData('prices');
+  const tbody = document.getElementById('pub-prices-tbody');
+  if(!prices.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">No price data available.</td></tr>';
+    return;
+  }
+  const today = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'});
+  tbody.innerHTML = prices.map(p=>`
+    <tr>
+      <td style="font-weight:500">${esc(p.name)}</td>
+      <td><span class="badge badge-green">${esc(p.category)}</span></td>
+      <td>${esc(p.unit)}</td>
+      <td>&#8369;${esc(p.farmgate)}</td>
+      <td>&#8369;${esc(p.retail)}</td>
+      <td>${p.change==='up' ? '<span class="price-up-cell">&#9650; Up</span>' : p.change==='down' ? '<span class="price-down-cell">&#9660; Down</span>' : '<span class="price-same">&#8212; Same</span>'}</td>
+      <td style="font-size:12px;color:var(--muted)">${today}</td>
+    </tr>`).join('');
+}
+
+function renderPublicDash(){
+  const sd = getData('sd');
+  setText('dash-production', sd.production || '—');
+  setText('dash-farmers',    sd.farmers    || '—');
+  setText('dash-price',      sd.avgprice   || '—');
+  setText('dash-markets',    sd.markets    || '—');
+
+  const trendEl = (id, val, isUp) => {
+    const el = document.getElementById(id);
+    if(el){
+      el.textContent = val || '';
+      el.className = 'm-trend' + (isUp ? ' up' : ' down');
+    }
+  };
+  const isUp = v => v && (v.startsWith('+') || (!v.startsWith('-')));
+  trendEl('dash-prod-trend',  sd.prodTrend,  isUp(sd.prodTrend));
+  trendEl('dash-farm-trend',  sd.farmTrend,  isUp(sd.farmTrend));
+  trendEl('dash-price-trend', sd.priceTrend, isUp(sd.priceTrend));
+  trendEl('dash-mkt-trend',   sd.mktTrend,   isUp(sd.mktTrend));
+
+  const sumEl = document.getElementById('pub-sd-summary');
+  if(sumEl) sumEl.textContent = sd.summary || 'No summary data available.';
+}
+
+function money(value){
+  const num = Number(value);
+  if(!Number.isFinite(num)) return '—';
+  return '&#8369;' + num.toFixed(num % 1 ? 2 : 0);
+}
+
+function marketDateLabel(dateValue){
+  if(!dateValue) return '—';
+  return formatDate(dateValue);
+}
+
+async function loadMarketRecords(){
+  if(!PRICE_MONITOR_URL) return [];
+  try{
+    const res = await fetch(PRICE_MONITOR_URL + '?action=getRecords&ts=' + Date.now());
+    const json = await res.json();
+    if(json.status !== 'success') throw new Error(json.message || 'Unable to load market monitoring records');
+    return Array.isArray(json.records) ? json.records : [];
+  }catch(err){
+    console.error(err);
+    return [];
+  }
+}
+
+function summarizeMarketRecords(records){
+  const usable = records.filter(r => r && r.date && r.data);
+  if(!usable.length) return null;
+
+  const latestDate = usable.reduce((latest, r) => r.date > latest ? r.date : latest, usable[0].date);
+  const latestRecords = usable.filter(r => r.date === latestDate);
+  const markets = [...new Set(latestRecords.map(r => r.market).filter(Boolean))];
+  const itemRows = [];
+
+  PRICE_MONITOR_ITEMS.forEach(item => {
+    const prices = latestRecords
+      .map(rec => rec.data?.[item.id])
+      .filter(v => v && Number(v.pr) > 0);
+
+    if(!prices.length) return;
+
+    const lowValues = prices.map(v => Number(v.lo)).filter(Number.isFinite).filter(v => v > 0);
+    const highValues = prices.map(v => Number(v.hi)).filter(Number.isFinite).filter(v => v > 0);
+    const prevailingValues = prices.map(v => Number(v.pr)).filter(Number.isFinite).filter(v => v > 0);
+    const avgPrevailing = prevailingValues.reduce((a,b) => a + b, 0) / prevailingValues.length;
+
+    itemRows.push({
+      ...item,
+      low: lowValues.length ? Math.min(...lowValues) : null,
+      high: highValues.length ? Math.max(...highValues) : null,
+      prevailing: avgPrevailing,
+      count: prices.length
+    });
+  });
+
+  const avg = itemRows.length
+    ? itemRows.reduce((sum, row) => sum + row.prevailing, 0) / itemRows.length
+    : null;
+
+  itemRows.sort((a,b) => b.count - a.count || b.prevailing - a.prevailing);
+
+  return {
+    latestDate,
+    marketCount: markets.length,
+    markets,
+    commodityCount: itemRows.length,
+    averagePrevailing: avg,
+    rows: itemRows.slice(0, 8)
+  };
+}
+
+async function renderMarketMonitorSummary(){
+  const tbody = document.getElementById('market-live-tbody');
+  if(!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted)">Loading market monitoring data...</td></tr>';
+  const records = await loadMarketRecords();
+  MARKET_SUMMARY = summarizeMarketRecords(records);
+
+  if(!MARKET_SUMMARY){
+    document.getElementById('market-live-date').textContent = '—';
+    document.getElementById('market-live-markets').textContent = '—';
+    document.getElementById('market-live-commodities').textContent = '—';
+    document.getElementById('market-live-avg').innerHTML = '—';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted)">No market monitoring records available.</td></tr>';
+    return;
+  }
+
+  document.getElementById('market-live-date').textContent = marketDateLabel(MARKET_SUMMARY.latestDate);
+  document.getElementById('market-live-markets').textContent = MARKET_SUMMARY.marketCount;
+  document.getElementById('market-live-commodities').textContent = MARKET_SUMMARY.commodityCount;
+  document.getElementById('market-live-avg').innerHTML = money(MARKET_SUMMARY.averagePrevailing);
+
+  setText('dash-markets', MARKET_SUMMARY.marketCount || '—');
+  setText('dash-price', MARKET_SUMMARY.averagePrevailing ? '₱' + MARKET_SUMMARY.averagePrevailing.toFixed(2) : '—');
+  const marketTrend = document.getElementById('dash-mkt-trend');
+  if(marketTrend) marketTrend.textContent = 'Latest monitoring: ' + marketDateLabel(MARKET_SUMMARY.latestDate);
+  const priceTrend = document.getElementById('dash-price-trend');
+  if(priceTrend) priceTrend.textContent = MARKET_SUMMARY.commodityCount + ' commodities monitored';
+
+  tbody.innerHTML = MARKET_SUMMARY.rows.map(row => `
+    <tr>
+      <td>${esc(row.name)}</td>
+      <td>${esc(row.unit)}</td>
+      <td>${money(row.low)}</td>
+      <td>${money(row.high)}</td>
+      <td>${money(row.prevailing)}</td>
+    </tr>
+  `).join('');
+}
+
+function renderPublicRISE(){
+  const r = getData('rise');
+  setText('pub-rise-intro', r.intro);
+  const grid = document.getElementById('pub-rise-grid');
+  if(grid){
+    grid.innerHTML = `
+      <div class="rise-card r"><div class="rise-letter">R</div><h4>${esc(r.rTitle)}</h4><p>${esc(r.rDesc)}</p></div>
+      <div class="rise-card i"><div class="rise-letter">I</div><h4>${esc(r.iTitle)}</h4><p>${esc(r.iDesc)}</p></div>
+      <div class="rise-card s"><div class="rise-letter">S</div><h4>${esc(r.sTitle)}</h4><p>${esc(r.sDesc)}</p></div>
+      <div class="rise-card e"><div class="rise-letter">E</div><h4>${esc(r.eTitle)}</h4><p>${esc(r.eDesc)}</p></div>`;
+  }
+}
+
+function renderPublicContact(){
+  const c = getData('contact');
+  setText('pub-address', c.address);
+  setText('pub-phone',   c.phone);
+  setText('pub-email',   c.email);
+  const hoursEl = document.getElementById('pub-hours');
+  if(hoursEl && c.hours) hoursEl.innerHTML = c.hours.replace(/,\s*/g,'<br>');
+}
+
+function renderTicker(){
+  const prices = getData('prices');
+  const track  = document.getElementById('ticker-track');
+  if(!prices.length){ track.innerHTML='<span class="titem">No price data — add commodities in Admin.</span>'; return; }
+  const items = prices.map(p=>{
+    const arrow = p.change==='up'
+      ? `<span class="price-up">&#9650; &#8369;${p.retail}</span>`
+      : p.change==='down'
+      ? `<span class="price-down">&#9660; &#8369;${p.retail}</span>`
+      : `<span>&#8369;${p.retail}</span>`;
+    return `<span class="titem">${esc(p.name)} &mdash; ${arrow}</span>`;
+  }).join('');
+  // Duplicate for seamless looping
+  track.innerHTML = items + items;
+}
+
+// ============================================================
+// MAPS PUBLIC
+// ============================================================
+let currentMapTab = 'agri';
+
+function setMapTab(el, cat){
+  document.querySelectorAll('.mt').forEach(t => t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  currentMapTab = cat;
+  renderMapDisplay(cat);
+}
+
+function renderMapDisplay(cat){
+  const maps = getData('maps');
+  const match = maps.find(m => m.category === cat);
+  const display = document.getElementById('map-display');
+  if(!display) return;
+
+  if(match && match.url){
+    display.innerHTML = `<div class="map-iframe-wrap"><iframe src="${esc(match.url)}" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>`;
+  } else {
+    const labels = {agri:'Agri Production Sites',market:'Market Locations',project:'Project Areas',fishery:'Fishery Zones'};
+    display.innerHTML = `<div class="map-ph">
+      <i class="ti ti-map"></i>
+      <strong>${labels[cat] || 'Map'}</strong>
+      <span>No map link added for this category yet.</span>
+      <span style="font-size:12px;color:var(--muted)">Go to Admin &rarr; Maps to add a link.</span>
+    </div>`;
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(async function init(){
+  mergeRemoteData(null);
+  showView('login');
+  await loadRemoteData({silent:true});
+  renderPublic();
+})();
+</script>
+</body>
+</html>
