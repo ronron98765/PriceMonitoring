@@ -254,7 +254,7 @@ select:focus,input[type=date]:focus{border-color:var(--navy-mid);box-shadow:0 0 
 .nav-account{display:flex;align-items:center;gap:8px;margin-left:10px}
 .nav-role-badge{font-size:9px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap}
 .nav-role-badge.role-public{background:rgba(255,255,255,0.14);color:#e6ecf5}
-.nav-role-badge.role-inputter{background:#BA7517;color:#fff}
+.nav-role-badge.role-encoder{background:#BA7517;color:#fff}
 .nav-role-badge.role-verifier{background:#378ADD;color:#fff}
 .nav-role-badge.role-admin{background:#0F6E56;color:#fff}
 .approvals-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
@@ -544,7 +544,7 @@ select:focus,input[type=date]:focus{border-color:var(--navy-mid);box-shadow:0 0 
     <div class="card-header">
       <div>
         <div class="card-title">Pending Approvals</div>
-        <div class="admin-note">Entries submitted by Inputters wait here until a Verifier or Admin approves them. Nothing appears on the Dashboard, History, or Year Comparison until it's approved.</div>
+        <div class="admin-note">Entries submitted by encoders wait here until a Verifier or Admin approves them. Nothing appears on the Dashboard, History, or Year Comparison until it's approved.</div>
       </div>
     </div>
     <div class="admin-list" id="approvalsList"></div>
@@ -681,7 +681,7 @@ select:focus,input[type=date]:focus{border-color:var(--navy-mid);box-shadow:0 0 
             <label>Access Level</label>
             <select id="adminUserRole">
               <option value="public">Public Viewing — Dashboard only</option>
-              <option value="inputter">Inputter — Dashboard, Year Comparison, Entry</option>
+              <option value="encoder">encoder — Dashboard, Year Comparison, Entry</option>
               <option value="verifier">Verifier — Dashboard, Year Comparison, History, Entry</option>
             </select>
           </div>
@@ -880,10 +880,10 @@ const RESPONDENT_STORAGE_KEY='bantay_presyo_respondent_count_v1';
 const MARKET_STORAGE_KEY='bantay_presyo_market_config_v1';
 const ADMIN_SESSION_KEY='bantay_presyo_admin_unlocked';
 const CURRENT_USER_SESSION_KEY='bantay_presyo_current_user';
-const ROLE_LABELS={public:'Public Viewing',inputter:'Inputter',verifier:'Verifier',admin:'Administrator'};
+const ROLE_LABELS={public:'Public Viewing',encoder:'encoder',verifier:'Verifier',admin:'Administrator'};
 const ROLE_TABS={
   public:['dashboard'],
-  inputter:['dashboard','comparison','entry'],
+  encoder:['dashboard','comparison','entry'],
   verifier:['dashboard','comparison','history','entry','approvals'],
   admin:['dashboard','comparison','history','entry','approvals','admin']
 };
@@ -1199,7 +1199,7 @@ function adminLogout(){
 // ═══════════════════════════════════
 // USER ACCOUNTS & ROLE-BASED ACCESS
 // (accounts live server-side in the Google Sheet Settings tab, synced via
-// the getUsers/saveUsers actions, so Inputter/Verifier/Admin logins work
+// the getUsers/saveUsers actions, so encoder/Verifier/Admin logins work
 // the same regardless of which device someone signs in from)
 // ═══════════════════════════════════
 let USER_ACCOUNTS=[];
@@ -1276,7 +1276,7 @@ function applyRoleVisibility(){
     }
   }
   const note=document.getElementById('entryReviewNote');
-  if(note)note.style.display=role==='inputter'?'block':'none';
+  if(note)note.style.display=role==='encoder'?'block':'none';
   renderNavAccount();
 }
 
